@@ -38,6 +38,7 @@ background-attachment: fixed;">
         <div class="form-group">
             <label for="isbn">ISBN</label>
             <input type="text" class="form-control" name="isbn" id="isbn" placeholder="请输入ISBN">
+            <input type="button" name="btnAuto" id="btnAuto" onclick="queryBook()" value="查询信息"/>
         </div>
         <div class="form-group">
             <label for="introduction">简介</label>
@@ -73,6 +74,21 @@ background-attachment: fixed;">
                     return false;
                 }
             })
+
+            function queryBook(){
+                var isbn=$("#isbn").val();
+                $.ajax({
+                   url:"/query/book/"+isbn,
+                   method:"get",
+                    success:function(data){
+                       if(data.code == 200){
+                           $("#author").val(data.author);
+                       }else{
+                           alert(data.msg);
+                       }
+                    }
+                });
+            }
         </script>
     </form>
 </div>

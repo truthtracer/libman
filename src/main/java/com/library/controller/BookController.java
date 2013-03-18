@@ -3,13 +3,14 @@ package com.library.controller;
 import com.library.bean.Book;
 import com.library.bean.Lend;
 import com.library.bean.ReaderCard;
+import com.library.dto.AjaxResp;
 import com.library.dto.BookDto;
 import com.library.service.BookService;
+import com.library.service.IsBnApiService;
 import com.library.service.LendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -18,14 +19,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Logger;
 
 @Controller
 public class BookController {
+    private org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+
     @Autowired
     private BookService bookService;
     @Autowired
     private LendService lendService;
-
+    @Autowired
+    private IsBnApiService isBnApiService;
     private Date getDate(String pubstr) {
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -33,6 +38,20 @@ public class BookController {
         } catch (ParseException e) {
             e.printStackTrace();
             return new Date();
+        }
+    }
+    @RequestMapping(value = "/query/book/{isbn}",method = RequestMethod.GET)
+    @ResponseBody
+    public AjaxResp<Book> queryBook(@PathVariable String isbn){
+        try {
+            Book bk =  isBnApiService.queryByIsbn(isbn);
+            if(bk != null)
+                return new AjaxResp<>(200,"ok",bk);
+            else
+                return new AjaxResp<>(500,"fail",null);
+        }catch (Exception e){
+            log.error("query book failed",e);
+            return new AjaxResp<>(500,"fail",null);
         }
     }
 
