@@ -23,11 +23,11 @@ import com.alibaba.fastjson.JSON;
 import com.library.bean.Book;
 import com.library.dto.Detail;
 import com.library.dto.QueryByIsBnDto;
-import com.mysql.jdbc.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import sun.misc.BASE64Encoder;
 
 @Service
@@ -35,12 +35,6 @@ public class IsBnApiService {
     @Autowired
     private Propert propert;
     String source = "market";
-//    @Value("${secretKey}")
-//    private String secretKey;
-//    @Value("${secretId}")
-//    private String secretId;
-//    @Value("${url:https://service-ed62t9xo-1305308687.gz.apigw.tencentcs.com/release/isbn/query}")
-//    private String queryurl;
     private Logger log = Logger.getLogger(this.getClass());
 
     public String init(String datetime) {
@@ -88,6 +82,7 @@ public class IsBnApiService {
         headers.put("X-Source", source);
         headers.put("X-Date", datetime);
         headers.put("Authorization", auth);
+        headers.put("Content-Type","application/json;charset=UTF-8");
         // 查询参数
         Map<String, String> queryParams = new HashMap<String, String>();
 
@@ -130,13 +125,13 @@ public class IsBnApiService {
             }
 
             // 定义 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
             String line;
             String result = "";
             while ((line = in.readLine()) != null) {
                 result += line;
             }
-            if(!StringUtils.isNullOrEmpty(result)){
+            if(!StringUtils.isEmpty(result)){
                 QueryByIsBnDto queryByIsBnDto=JSON.parseObject(result, QueryByIsBnDto.class);
                 if(queryByIsBnDto.getCode()==200){
                     SimpleDateFormat ssdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -150,8 +145,13 @@ public class IsBnApiService {
                         bk.setIntroduction(detail.getGist());
                         bk.setLanguage(detail.getLanguage());
                         bk.setPrice(detail.getPrice());
-                        bk.setPubdate(ssdf.parse(detail.getPubDate()));
-                        if(!StringUtils.isNullOrEmpty(detail.getSubject())){
+                        bk.setPub_date(org.springframework.util.StringUtils.isEmpty(detail.getPubDate()) ?
+                                "" :
+                                (detail.getPubDate().length() == 6 ?
+                                    detail.getPubDate().substring(0,4)+"-"+ detail.getPubDate().substring(4, detail.getPubDate().length())+"-01"
+                                    : detail.getPubDate().substring(0,4)+"-"+ detail.getPubDate().substring(4, 6)+"-"+  detail.getPubDate().substring(6, detail.getPubDate().length())
+                                ));
+                        if(!StringUtils.isEmpty(detail.getSubject())){
                             log.info("subject :"+detail.getSubject()+" of isbn:"+isbn);
                         }
                         return bk;
