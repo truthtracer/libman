@@ -82,7 +82,11 @@ background-attachment: fixed;">
             })
 
             function queryBook(){
-                var isbn=$("#isbn").val();
+                var isbn=$("#isbn").val().trim();
+                if(isbn === ""){
+                    alert("请输入ISBN,再自动填充");
+                    return;
+                }
                 $.ajax({
                    url:"query/book/"+isbn,
                    method:"get",
