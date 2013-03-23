@@ -11,6 +11,9 @@ public class ClazzDao {
     private final static String NAMESPACE = "com.library.dao.ClazzDao.";
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
+    public ClassInfo getById(int id){
+        return sqlSessionTemplate.selectOne(NAMESPACE+"getById",id);
+    }
     public List<ClassInfo> getAllClassInfo(){
         return sqlSessionTemplate.selectList(NAMESPACE + "getAll");
     }

@@ -13,4 +13,9 @@ public class ClazzService {
     public List<ClassInfo> getAll(){
         return clazzDao.getAllClassInfo();
     }
+    public ClassInfo getByID(Integer id){
+        if(id == null)
+            return null;
+        return clazzDao.getById(id);
+    }
 }

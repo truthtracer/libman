@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
 <head>
     <title>编辑《 ${detail.name}》</title>
@@ -58,8 +59,15 @@ background-attachment: fixed;">
                     <input type="date" class="form-control" name="pubstr" id="pubstr" value="${detail.pubdate}">
                 </div>
                 <div class="input-group">
-                    <span  class="input-group-addon">分类号</span>
-                    <input type="text" class="form-control" name="classId" id="classId" value="${detail.classId}">
+                    <span  class="input-group-addon">分类</span>
+                    <select  class="form-control" name="classId" id="classId">
+                        <option value="">--选择分类--</option>
+                        <c:forEach items="${clazzList}" var="clz">
+                            <option value="${clz.class_id}" <c:if test="${detail.classId== clz.class_id}" >selected="selected"</c:if>>${clz.class_name}</option>
+                        </c:forEach>
+                    </select>
+
+
                 </div>
                 <div class="input-group">
                     <span  class="input-group-addon">数量</span>
