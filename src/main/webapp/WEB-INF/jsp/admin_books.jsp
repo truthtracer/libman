@@ -49,6 +49,12 @@ background-attachment: fixed;">
            subMit();
          }
 
+         function del(url,book){
+             if(confirm("确定删除《"+book+"》吗？")){
+                 location.href=url;
+             }
+         }
+
         function  sub() {
             // var val=$("#search").val();
             $("#hdnPage").val($("#selPgNm").val());
@@ -111,7 +117,7 @@ background-attachment: fixed;">
                     <button type="button" class="btn btn-success btn-xs">详情</button>
                 </a></td>
                 <td><a href="updatebook.html?bookId=<c:out value="${book.bookId}"></c:out>"><button type="button" class="btn btn-info btn-xs">编辑</button></a></td>
-                <td><a href="deletebook.html?bookId=<c:out value="${book.bookId}"></c:out>"><button type="button" class="btn btn-danger btn-xs">删除</button></a></td>
+                <td><a href='javascript:void(0)' onclick="del('deletebook.html?bookId=${book.bookId}','${book.name}')"><button type="button" class="btn btn-danger btn-xs">删除</button></a></td>
             </tr>
             </c:forEach>
             </tbody>
