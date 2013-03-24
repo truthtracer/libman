@@ -21,6 +21,7 @@
         <commons-codec.version>1.9</commons-codec.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
         <jetty.version>8.1.8.v20121106</jetty.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
     </properties>
     <dependencies>
         <dependency>
@@ -46,6 +47,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
@@ -90,6 +96,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.59</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache.httpclient.version}</version>
         </dependency>
     </dependencies>
 

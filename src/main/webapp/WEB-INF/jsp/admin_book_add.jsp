@@ -100,13 +100,13 @@ background-attachment: fixed;">
                            $("#name").val(data.data.name);
                            $("#publish").val(data.data.publish);
                            $("#introduction").text(data.data.introduction);
-                           $("#language").val(data.data.language);
+                           if(data.data.language) {
+                               $("#language").val(data.data.language);
+                           }
                            $("#price").val(data.data.price);
                            $("#pubstr").val(data.data.pubdate);
                        }else{
-                           if(data.msg === 'fail') {
-                               alert("查询图书失败，无法自动填充");
-                           }
+                           alert(data.msg);
                        }
                     }
                 });

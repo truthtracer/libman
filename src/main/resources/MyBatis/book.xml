@@ -7,6 +7,12 @@
         #{introduction}, #{language}, #{price}, #{pub_date},
         #{class_id}, #{number})
     </insert>
+    <update id="changeStruc">
+        alter table book_info
+            modify `name` varchar(100),
+            modify author varchar(100),
+            modify publish varchar(100);
+    </update>
     <update id="editBook" parameterType="com.library.bean.Book">
         update book_info set name=#{name}, author=#{author},
         publish=#{publish}, ISBN=#{ISBN}, introduction=#{introduction},

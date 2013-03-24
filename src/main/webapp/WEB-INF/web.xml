@@ -20,6 +20,9 @@
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
+    <listener>
+        <listener-class>com.library.service.StartedListener</listener-class>
+    </listener>
 
     <filter>
         <filter-name>encodingFilter</filter-name>

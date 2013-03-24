@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository
+@Repository("bookDao")
 public class BookDao {
 
     private final static String NAMESPACE = "com.library.dao.BookDao.";
@@ -18,13 +18,15 @@ public class BookDao {
     private SqlSessionTemplate sqlSessionTemplate;
 
     public int matchBook(final Book book){
-
         return sqlSessionTemplate.selectOne(NAMESPACE + "matchBook", book);
+    }
+
+    public void changeStruc(){
+        sqlSessionTemplate.update(NAMESPACE+"changeStruc");
     }
 
     public int countBook(final BookDto bookDto){
         return sqlSessionTemplate.selectOne(NAMESPACE + "countBook", bookDto);
-
     }
 
     public ArrayList<Book> queryBook(BookDto book) {
