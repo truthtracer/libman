@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class RestTemplateConfig {
     @Bean
     public RestTemplate restTemplate() throws Exception {
-        return createNewRestTemplate(3000, 3000, 5000);
+        return createNewRestTemplate(3000, 3000, 30000);
     }
 
     @Bean

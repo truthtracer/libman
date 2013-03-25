@@ -46,6 +46,9 @@ public class BookDao {
         return sqlSessionTemplate.insert(NAMESPACE + "addBook", book);
     }
 
+    public List<Book> queryBookByIsbn(String isbn){
+        return sqlSessionTemplate.selectList(NAMESPACE+"queryByIsbn",isbn);
+    }
     public Book getBook(final long bookId) {
         return sqlSessionTemplate.selectOne(NAMESPACE + "getBook", bookId);
     }
