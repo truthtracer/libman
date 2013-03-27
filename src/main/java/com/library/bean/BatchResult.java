@@ -4,6 +4,7 @@ public class BatchResult {
     private int total;
     private int success;
     private int fail;
+    private int timeout;
     private String batchNo;
     private int handling;
 
@@ -45,5 +46,13 @@ public class BatchResult {
 
     public void setBatchNo(String batchNo) {
         this.batchNo = batchNo;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 }

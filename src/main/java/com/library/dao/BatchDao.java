@@ -31,6 +31,9 @@ public class BatchDao {
     public List<Result> findHandlingResult(){
         return sqlSessionTemplate.selectList(NAMESPACE+"findHandlingResult");
     }
+    public List<Result> findTimeoutResult(){
+        return sqlSessionTemplate.selectList(NAMESPACE +"findTimeoutResult");
+    }
 
     public Batch queryByIsbn(final String isbn){
         return sqlSessionTemplate.selectOne(NAMESPACE + "queryByIsbn", isbn);

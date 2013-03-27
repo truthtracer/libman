@@ -3,7 +3,7 @@ package com.library.bean;
 public class Batch {
     private String batchNo;
     /**
-     * 0-失败 1-成功
+     * 0-失败 1-成功  2-超时
      */
     private Integer status;
     private String isbn;

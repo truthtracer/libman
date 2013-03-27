@@ -88,43 +88,51 @@ public class IsBnApiService {
             TimerTask t=new TimerTask() {
                 @Override
                 public void run() {
-                    int idx=atomicInteger.getAndAdd(1);
-                    List<String> lst = listList.get( idx == listList.size() ? idx-1
-                            : idx);
+                    int idx = atomicInteger.getAndAdd(1);
+                    List<String> lst = listList.get( idx == listList.size() ? idx-1 : idx);
                     if(atomicInteger.get() > listList.size()){
                         this.cancel();
                     }
                     for (String temp : lst) {
-                        BookAutoRequestVo bookAutoRequestVo = CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))?
-                                queryByIsbn(temp) : null;
-                        if(bookAutoRequestVo == null){
-                            Batch batch = new Batch();
-                            batch.setIsbn(temp);
-                            batch.setStatus(1);
-                            batch.setFailCause("");
-                            batchDao.updateByIsbn(batch);
-                            continue;
-                        }
-                        if (bookAutoRequestVo.getCode().equals(100)) {
-                            if (bookAutoRequestVo.getBook() != null) {
-                                Book bk = bookAutoRequestVo.getBook();
-                                bk.setLanguage("中文");
-                                bk.setNumber(1);
-                                if(CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))) {
-                                    bookDao.addBook(bk);
-                                }
-
+                        try {
+                            BookAutoRequestVo bookAutoRequestVo = CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp)) ?
+                                    queryByIsbn(temp) : null;
+                            if (bookAutoRequestVo == null) {
                                 Batch batch = new Batch();
                                 batch.setIsbn(temp);
                                 batch.setStatus(1);
                                 batch.setFailCause("");
                                 batchDao.updateByIsbn(batch);
+                                continue;
                             }
-                        }else{
+                            if (bookAutoRequestVo.getCode().equals(100)) {
+                                if (bookAutoRequestVo.getBook() != null) {
+                                    Book bk = bookAutoRequestVo.getBook();
+                                    bk.setLanguage("中文");
+                                    bk.setNumber(1);
+                                    if (CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))) {
+                                        bookDao.addBook(bk);
+                                    }
+
+                                    Batch batch = new Batch();
+                                    batch.setIsbn(temp);
+                                    batch.setStatus(1);
+                                    batch.setFailCause("");
+                                    batchDao.updateByIsbn(batch);
+                                }
+                            } else {
+                                Batch batch = new Batch();
+                                batch.setIsbn(temp);
+                                batch.setStatus(0);
+                                batch.setFailCause(bookAutoRequestVo.getMsg());
+                                batchDao.updateByIsbn(batch);
+                            }
+                        }catch (Exception e){
+                            log.error(e.getMessage(),e);
                             Batch batch=new Batch();
                             batch.setIsbn(temp);
-                            batch.setStatus(0);//.getCode());
-                            batch.setFailCause(bookAutoRequestVo.getMsg());
+                            batch.setStatus(2);
+                            batch.setFailCause(e.getMessage());
                             batchDao.updateByIsbn(batch);
                         }
                     }

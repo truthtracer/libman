@@ -24,7 +24,9 @@
     <select id="findHandlingResult" resultMap="rstStatis">
         select count(isbn) as ct ,batchNo from batch where status is null group by batchNo;
     </select>
-
+    <select id="findTimeoutResult" resultMap="rstStatis">
+        select count(isbn) as ct ,batchNo from batch where status is not null and status = 2 group by batchNo;
+    </select>
     <select id="queryByIsbn" resultMap="rstMap">
         select * from batch where isbn=#{isbn}
     </select>
