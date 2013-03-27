@@ -95,14 +95,34 @@ public class BookController {
     }
 
     @RequestMapping("/reader_querybook_do.html")
-    public ModelAndView readerQueryBookDo(String searchWord,Integer choice) {
+    public ModelAndView readerQueryBookDo(HttpServletRequest request,String searchWord,Integer choice,int pageNum,int pageSize) {
         if (bookService.matchBook(searchWord, choice)) {
-            ArrayList<Book> books = bookService.queryBookForReader(searchWord,choice);
+            ArrayList<Book> books = bookService.queryBookForReader(searchWord,choice,pageSize,pageNum);
+
+            ReaderCard readerCard = (ReaderCard) request.getSession().getAttribute("readercard");
+            ArrayList<Lend> myAllLendList = lendService.myLendList(readerCard.getReaderId());
+            ArrayList<Long> myLendList = new ArrayList<>();
+            for (Lend lend : myAllLendList) {
+                // 是否已归还
+                if (lend.getBackDate() == null) {
+                    myLendList.add(lend.getBookId());
+                }
+            }
+
             ModelAndView modelAndView = new ModelAndView("reader_books");
             modelAndView.addObject("books", books);
+            modelAndView.addObject("myLendList", myLendList);
+            modelAndView.addObject("choice",choice);
+            int total = bookService.queryBookCount(searchWord,choice);
+            modelAndView.addObject("total",total);
+            modelAndView.addObject("pageNum",pageNum);
+            modelAndView.addObject("pageSize", pageSize);
+            modelAndView.addObject("pages", total%pageSize==0? total/pageSize : (total/pageSize)+1);
             return modelAndView;
         } else {
-            return new ModelAndView("reader_books", "error", "没有匹配的图书");
+            ModelAndView mv= new ModelAndView("reader_books", "error", "没有匹配的图书");
+            mv.addObject("choice",choice);
+            return mv;
         }
     }
 
@@ -254,8 +274,15 @@ public class BookController {
 
     @RequestMapping("/reader_books.html")
     public ModelAndView readerBooks(HttpServletRequest request) {
-        BookDto bookDto = new BookDto();
-        ArrayList<Book> books = bookService.getAllBooks(bookDto);
+
+        final int pageSize=10;
+        final int pageNum=1;
+        BookDto book=new BookDto();
+        book.setOffset(0);
+        book.setPageSize(pageSize);
+
+
+        ArrayList<Book> books = bookService.getAllBooks(book);
         ReaderCard readerCard = (ReaderCard) request.getSession().getAttribute("readercard");
         ArrayList<Lend> myAllLendList = lendService.myLendList(readerCard.getReaderId());
         ArrayList<Long> myLendList = new ArrayList<>();
@@ -268,6 +295,12 @@ public class BookController {
         ModelAndView modelAndView = new ModelAndView("reader_books");
         modelAndView.addObject("books", books);
         modelAndView.addObject("myLendList", myLendList);
+        int total = bookService.queryBookCount(null,null);
+
+        modelAndView.addObject("total",total);
+        modelAndView.addObject("pageNum",pageNum);
+        modelAndView.addObject("pageSize",pageSize);
+        modelAndView.addObject("pages", total%pageSize==0? total/pageSize : (total/pageSize)+1);
         return modelAndView;
     }
 }

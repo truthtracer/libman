@@ -19,7 +19,7 @@ public class BookService {
     public List<Book> queryBook(String isbn){
      return bookDao.queryBookByIsbn(isbn);
     }
-    public ArrayList<Book> queryBookForReader(String searchWord,Integer choice){
+    public ArrayList<Book> queryBookForReader(String searchWord,Integer choice,Integer pageSize,Integer pageNum){
         String search = null;
         if(searchWord != null){
             search="%" + searchWord.trim() + "%";
@@ -35,13 +35,22 @@ public class BookService {
             }
         }
         BookDto bookDto=new BookDto();
+        if(pageSize == 0){
+            pageSize=10;
+        }
+        if(pageNum==0){
+            pageNum=1;
+        }
         bookDto.setName(book.getName());
         bookDto.setIsbn(book.getIsbn());
-        ArrayList<Book> arr= bookDao.queryBook(bookDto);
+        bookDto.setPageNum(pageNum);
+        bookDto.setPageSize(pageSize);
+        ArrayList<Book> arr = bookDao.queryBook(bookDto);
         log.info("arr: "+ arr.size());
         System.out.println("arr: "+ arr.size());
         return arr;
     }
+
     public ArrayList<Book> queryBook(String searchWord,Integer choice,int pageSize,int pageNum) {
         String search = null;
         if(searchWord != null){
