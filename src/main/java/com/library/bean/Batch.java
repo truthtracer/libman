@@ -3,7 +3,7 @@ package com.library.bean;
 public class Batch {
     private String batchNo;
     /**
-     * 0-失败 1-成功  2-超时
+     * 0-失败 1-成功  2-未找到书籍的
      */
     private Integer status;
     private String isbn;
@@ -38,6 +38,11 @@ public class Batch {
     }
 
     public void setFailCause(String failCause) {
+        if(failCause!= null){
+            if(failCause.length() > 200){
+                failCause = failCause.substring(0, 200);
+            }
+        }
         this.failCause = failCause;
     }
 }

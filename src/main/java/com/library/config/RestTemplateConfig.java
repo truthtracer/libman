@@ -31,22 +31,7 @@ import java.util.stream.Collectors;
 public class RestTemplateConfig {
     @Bean
     public RestTemplate restTemplate() throws Exception {
-        return createNewRestTemplate(3000, 3000, 30000);
-    }
-
-    @Bean
-    public RestTemplate reportRestTemplate() throws Exception {
-        return createNewRestTemplate(3000, 5000, 30000, 2);
-    }
-
-    @Bean
-    public RestTemplate behRestTemplate() throws Exception {
-        return createNewRestTemplate(1000, 1000, 3000);
-    }
-
-    @Bean
-    public RestTemplate publicRestTemplate() throws Exception {
-        return createNewRestTemplate(1500, 1500, 3500);
+        return createNewRestTemplate(5000, 5000, 60000);
     }
 
     private RestTemplate createNewRestTemplate(final int requestTimeout, final int connectTimeout,

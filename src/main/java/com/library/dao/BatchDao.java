@@ -31,12 +31,12 @@ public class BatchDao {
     public List<Result> findHandlingResult(){
         return sqlSessionTemplate.selectList(NAMESPACE+"findHandlingResult");
     }
-    public List<Result> findTimeoutResult(){
-        return sqlSessionTemplate.selectList(NAMESPACE +"findTimeoutResult");
+    public List<Result> findNotfoundResult(){
+        return sqlSessionTemplate.selectList(NAMESPACE +"findNotfoundResult");
     }
 
-    public Batch queryByIsbn(final String isbn){
-        return sqlSessionTemplate.selectOne(NAMESPACE + "queryByIsbn", isbn);
+    public Batch queryByIsbnAndBatchNo(Batch b){
+        return sqlSessionTemplate.selectOne(NAMESPACE + "queryByIsbnAndBatchNo", b);
     }
 
     public int updateByIsbn(final Batch batch){
@@ -45,5 +45,8 @@ public class BatchDao {
 
     public void changeStruc(){
         sqlSessionTemplate.update(NAMESPACE+"changeStruc");
+    }
+    public void changePrimary(){
+        sqlSessionTemplate.update(NAMESPACE+"changePrimary");
     }
 }

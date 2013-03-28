@@ -24,15 +24,15 @@
     <select id="findHandlingResult" resultMap="rstStatis">
         select count(isbn) as ct ,batchNo from batch where status is null group by batchNo;
     </select>
-    <select id="findTimeoutResult" resultMap="rstStatis">
+    <select id="findNotfoundResult" resultMap="rstStatis">
         select count(isbn) as ct ,batchNo from batch where status is not null and status = 2 group by batchNo;
     </select>
-    <select id="queryByIsbn" resultMap="rstMap">
-        select * from batch where isbn=#{isbn}
+    <select id="queryByIsbnAndBatchNo" resultMap="rstMap" parameterType="com.library.bean.Batch">
+        select * from batch where isbn=#{isbn} and batchNo=#{batchNo}
     </select>
 
     <update id="updateBatch" parameterType="com.library.bean.Batch">
-        update batch set status = #{status}, failCause=#{failCause} where isbn=#{isbn}
+        update batch set status = #{status}, failCause=#{failCause} where isbn=#{isbn} and batchNo=#{batchNo}
     </update>
     <insert id="insertBatch" parameterType="com.library.bean.Batch">
         insert into batch(batchNo,status,isbn,failCause) values
@@ -47,5 +47,9 @@
                                        failCause varchar(255) null,
                                        PRIMARY KEY (`isbn`) USING BTREE
         ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+    </update>
+    <update id="changePrimary">
+        ALTER TABLE batch DROP PRIMARY KEY;
+        ALTER TABLE batch ADD PRIMARY KEY (batchNo,isbn);
     </update>
 </mapper>
