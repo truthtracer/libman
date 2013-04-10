@@ -19,9 +19,14 @@ public class LendService {
     public boolean lendBook(long bookId,long readerId){
         return lendDao.lendBookOne(bookId,readerId)>0 && lendDao.lendBookTwo(bookId)>0;
     }
-
+    public boolean lendOrNot(Long bookId){
+        return lendDao.lendBookCount(bookId) > 0;
+    }
     public ArrayList<Lend> lendList(){
         return lendDao.lendList();
+    }
+    public ArrayList<Lend> lendListOfBook(Long bookId){
+        return lendDao.lendListOfBook(bookId);
     }
     public ArrayList<Lend> myLendList(long readerId){
         return lendDao.myLendList(readerId);
