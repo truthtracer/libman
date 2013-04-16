@@ -20,6 +20,9 @@ public class ReaderInfoService {
         return readerInfoDao.deleteReaderInfo(readerId) > 0;
     }
 
+    public Long queryLastReaderInfo(){
+        return readerInfoDao.queryLastReaderInfo();
+    }
     public ReaderInfo getReaderInfo(long readerId) {
         return readerInfoDao.findReaderInfoByReaderId(readerId);
     }
@@ -34,5 +37,8 @@ public class ReaderInfoService {
 
     public long addReaderInfo(ReaderInfo readerInfo) {
         return readerInfoDao.addReaderInfo(readerInfo);
+    }
+    public ReaderInfo getRed(Long readerNo){
+        return readerInfoDao.getRed(readerNo);
     }
 }

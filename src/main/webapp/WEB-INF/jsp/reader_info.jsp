@@ -47,7 +47,7 @@ background-attachment: fixed;">
             <table class="table table-hover">
                 <tr>
                     <th width="20%">读者证号</th>
-                    <td>${readerinfo.readerId}</td>
+                    <td>${readerinfo.readerNo}</td>
                 </tr>
                 <tr>
                     <th>姓名</th>

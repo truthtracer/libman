@@ -16,10 +16,16 @@ public class ReaderCardDao {
     private SqlSessionTemplate sqlSessionTemplate;
 
     private final static String NAMESPACE = "com.library.dao.ReaderCardDao.";
+    private final static String NAMESPACE_2 = "com.library.dao.ReaderInfoDao.";
 
-    public int getIdMatchCount(final long reader_id, final String password) {
+    public int getIdMatchCount(final long readerNo, final String password) {
+        Object obj = sqlSessionTemplate.selectOne(NAMESPACE_2+"fetchReader",readerNo);
+        if(obj == null){
+            return 0;
+        }
+        Long rederId = (Long)obj;
         Map<String, Object> map = new HashMap<>();
-        map.put("reader_id", reader_id);
+        map.put("reader_id", rederId);
         map.put("password", password);
         return sqlSessionTemplate.selectOne(NAMESPACE + "getIdMatchCount", map);
     }

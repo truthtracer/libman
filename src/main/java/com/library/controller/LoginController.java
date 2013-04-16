@@ -2,7 +2,9 @@ package com.library.controller;
 
 import com.library.bean.Admin;
 import com.library.bean.ReaderCard;
+import com.library.bean.ReaderInfo;
 import com.library.service.LoginService;
+import com.library.service.ReaderInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +21,8 @@ import java.util.HashMap;
 public class LoginController {
 
     private LoginService loginService;
-
+    @Autowired
+    private ReaderInfoService readerInfoService;
 
     @Autowired
     public void setLoginService(LoginService loginService) {
@@ -60,7 +63,12 @@ public class LoginController {
             res.put("stateCode", "1");
             res.put("msg", "管理员登陆成功！");
         } else if (isReader) {
-            ReaderCard readerCard = loginService.findReaderCardByReaderId(id);
+            ReaderInfo rdIf=readerInfoService.getRed(id);
+            Long rdid=0L;
+            if(rdIf!= null){
+                rdid = rdIf.getReaderId();
+            }
+            ReaderCard readerCard = loginService.findReaderCardByReaderId(rdid);
             request.getSession().setAttribute("readercard", readerCard);
             res.put("stateCode", "2");
             res.put("msg", "读者登陆成功！");

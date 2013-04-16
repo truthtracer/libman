@@ -2,6 +2,8 @@ package com.library.service;
 
 import com.library.dao.BatchDao;
 import com.library.dao.BookDao;
+import com.library.dao.LendDao;
+import com.library.dao.ReaderInfoDao;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -31,6 +33,25 @@ public class StartedListener implements ServletContextListener{
             batchDao.changePrimary();
         }catch (Exception e){
             e.printStackTrace();
+        }
+        try{
+            ReaderInfoDao readerInfoDao = ac.getBean(ReaderInfoDao.class);
+            readerInfoDao.changeStruc();
+            readerInfoDao.initReaderNo();
+        }catch (Exception exc){
+            exc.printStackTrace();
+        }
+        try{
+            ReaderInfoDao readerInfoDao =ac.getBean(ReaderInfoDao.class);
+            readerInfoDao.dropNotNull();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        try{
+            LendDao lendDao = ac.getBean(LendDao.class);
+            lendDao.changeStruc();
+        }catch (Exception exc){
+            exc.printStackTrace();
         }
     }
 

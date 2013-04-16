@@ -28,12 +28,20 @@ public class BookDao {
     public int countBook(final BookDto bookDto){
         return sqlSessionTemplate.selectOne(NAMESPACE + "countBook", bookDto);
     }
+    public int countNotBackBook(final BookDto bookDto){
+        return sqlSessionTemplate.selectOne(NAMESPACE+"countNotBackBook",bookDto);
+    }
 
     public ArrayList<Book> queryBook(BookDto book) {
         if(book.getPageNum() != null&& book.getPageSize()!= null) {
             book.setOffset((book.getPageNum() - 1) * book.getPageSize());
         }
-        List<Book> result = sqlSessionTemplate.selectList(NAMESPACE + "queryBook", book);
+
+        List<Book> result = null;
+        if(book.getStatus() == null)
+            result = sqlSessionTemplate.selectList(NAMESPACE + "queryBook", book);
+        else
+            result = sqlSessionTemplate.selectList(NAMESPACE+"queryNotBackBook",book);
         return (ArrayList<Book>) result;
     }
 

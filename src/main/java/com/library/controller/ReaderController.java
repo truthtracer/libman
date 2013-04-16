@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.bean.ReaderCard;
 import com.library.bean.ReaderInfo;
+import com.library.service.LendService;
 import com.library.service.LoginService;
 import com.library.service.ReaderCardService;
 import com.library.service.ReaderInfoService;
@@ -24,11 +25,12 @@ public class ReaderController {
 
     @Autowired
     private LoginService loginService;
-
+@Autowired
+private LendService lendService;
     @Autowired
     private ReaderCardService readerCardService;
 
-    private ReaderInfo getReaderInfo(long readerId, String name, String sex, String birth, String address, String phone) {
+    private ReaderInfo getReaderInfo(long readerId, String name, String sex, String birth, String address, String phone,Long readerNo) {
         ReaderInfo readerInfo = new ReaderInfo();
         Date date = new Date();
         try {
@@ -37,11 +39,13 @@ public class ReaderController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        readerInfo.setReaderNo(readerNo);
         readerInfo.setAddress(address);
         readerInfo.setName(name);
         readerInfo.setReaderId(readerId);
         readerInfo.setPhone(phone);
         readerInfo.setSex(sex);
+        readerInfo.setReaderNo(readerNo);
         readerInfo.setBirth(date);
         return readerInfo;
     }
@@ -58,6 +62,7 @@ public class ReaderController {
     public String readerDelete(HttpServletRequest request, RedirectAttributes redirectAttributes) {
         long readerId = Long.parseLong(request.getParameter("readerId"));
         if (readerInfoService.deleteReaderInfo(readerId) && readerCardService.deleteReaderCard(readerId)) {
+            lendService.deleteLendByReaderId(readerId);
             redirectAttributes.addFlashAttribute("succ", "删除成功！");
         } else {
             redirectAttributes.addFlashAttribute("error", "删除失败！");
@@ -84,31 +89,46 @@ public class ReaderController {
     }
 
     @RequestMapping("reader_edit_do.html")
-    public String readerInfoEditDo(HttpServletRequest request, String name, String sex, String birth, String address, String phone, RedirectAttributes redirectAttributes) {
+    public String readerInfoEditDo(HttpServletRequest request, String name, String sex, String birth, String address, String phone, Long readerNo,RedirectAttributes redirectAttributes) {
         long readerId = Long.parseLong(request.getParameter("readerId"));
-        ReaderInfo readerInfo = getReaderInfo(readerId, name, sex, birth, address, phone);
-        if (readerInfoService.editReaderInfo(readerInfo) && readerInfoService.editReaderCard(readerInfo)) {
-            redirectAttributes.addFlashAttribute("succ", "读者信息修改成功！");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "读者信息修改失败！");
+        ReaderInfo readerInfo = getReaderInfo(readerId, name, sex, birth, address, phone,readerNo);
+        ReaderInfo dbReaderInfo = readerInfoService.getRed(readerNo);
+        if(dbReaderInfo != null && !dbReaderInfo.getReaderNo().equals(readerNo)){
+            redirectAttributes.addFlashAttribute("error", "读者信息修改失败(读者号重复)！");
+        }else {
+            if (readerInfoService.editReaderInfo(readerInfo) && readerInfoService.editReaderCard(readerInfo)) {
+                redirectAttributes.addFlashAttribute("succ", "读者信息修改成功！");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "读者信息修改失败！");
+            }
         }
         return "redirect:/allreaders.html";
     }
 
     @RequestMapping("reader_add.html")
     public ModelAndView readerInfoAdd() {
-        return new ModelAndView("admin_reader_add");
+        ModelAndView mv = new ModelAndView("admin_reader_add");
+        mv.addObject("lastReaderNo", readerInfoService.queryLastReaderInfo());
+        return mv;
     }
 
     @RequestMapping("reader_add_do.html")
-    public String readerInfoAddDo(String name, String sex, String birth, String address, String phone, String password, RedirectAttributes redirectAttributes) {
-        ReaderInfo readerInfo = getReaderInfo(0, name, sex, birth, address, phone);
-        long readerId = readerInfoService.addReaderInfo(readerInfo);
-        readerInfo.setReaderId(readerId);
-        if (readerId > 0 && readerCardService.addReaderCard(readerInfo, password)) {
-            redirectAttributes.addFlashAttribute("succ", "添加读者信息成功！");
+    public String readerInfoAddDo(String name, String sex, String birth, String address, String phone,
+                                  String password,Long readerNo, RedirectAttributes redirectAttributes) {
+        ReaderInfo dbReaderInfo = readerInfoService.getRed(readerNo);
+        if (dbReaderInfo != null) {
+            redirectAttributes.addFlashAttribute("succ", "添加读者信息失败(读者号重复)！");
+
         } else {
-            redirectAttributes.addFlashAttribute("succ", "添加读者信息失败！");
+
+            ReaderInfo readerInfo = getReaderInfo(0, name, sex, birth, address, phone, readerNo);
+            long readerId = readerInfoService.addReaderInfo(readerInfo);
+            readerInfo.setReaderId(readerId);
+            if (readerId > 0 && readerCardService.addReaderCard(readerInfo, password)) {
+                redirectAttributes.addFlashAttribute("succ", "添加读者信息成功！");
+            } else {
+                redirectAttributes.addFlashAttribute("succ", "添加读者信息失败！");
+            }
         }
         return "redirect:/allreaders.html";
     }
@@ -123,9 +143,9 @@ public class ReaderController {
     }
 
     @RequestMapping("reader_edit_do_r.html")
-    public String readerInfoEditDoReader(HttpServletRequest request, String name, String sex, String birth, String address, String phone, RedirectAttributes redirectAttributes) {
+    public String readerInfoEditDoReader(HttpServletRequest request, String name, String sex, String birth, String address, String phone, Long readerNo,RedirectAttributes redirectAttributes) {
         ReaderCard readerCard = (ReaderCard) request.getSession().getAttribute("readercard");
-        ReaderInfo readerInfo = getReaderInfo(readerCard.getReaderId(), name, sex, birth, address, phone);
+        ReaderInfo readerInfo = getReaderInfo(readerCard.getReaderId(), name, sex, birth, address, phone,readerNo);
         if (readerInfoService.editReaderInfo(readerInfo) && readerInfoService.editReaderCard(readerInfo)) {
             ReaderCard readerCardNew = loginService.findReaderCardByReaderId(readerCard.getReaderId());
             request.getSession().setAttribute("readercard", readerCardNew);

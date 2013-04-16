@@ -15,6 +15,9 @@ public class LendService {
     public boolean returnBook(long bookId, long readerId){
         return lendDao.returnBookOne(bookId, readerId)>0 && lendDao.returnBookTwo(bookId)>0;
     }
+    public boolean deleteLendByReaderId(Long readerId){
+        return lendDao.deleteLendByReaderId(readerId)>0;
+    }
 
     public boolean lendBook(long bookId,long readerId){
         return lendDao.lendBookOne(bookId,readerId)>0 && lendDao.lendBookTwo(bookId)>0;

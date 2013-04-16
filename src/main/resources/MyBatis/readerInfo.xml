@@ -21,12 +21,43 @@
     </update>
     <insert id="addReaderInfo" parameterType="com.library.bean.ReaderInfo">
         insert into reader_info values
-        (null, #{name},#{sex},#{birth},#{address},#{phone})
+        (null, #{name},#{sex},#{birth},#{address},#{phone},#{readerNo})
     </insert>
     <select id="getReaderId" resultType="long" parameterType="com.library.bean.ReaderInfo">
         select reader_id from reader_info where
-        name = #{name} and sex = #{sex} and
-        birth = #{birth} and address = #{address}
+        name = #{name}
+    <if test="sex!=null and sex!=''"> and  sex = #{sex} </if>
+
+    <if test="address!=null and address!=''"> and address = #{address} </if>
+     <if test="phone!=null and phone !='' ">
         and phone = #{phone}
+     </if>
+    <if test="readerNo!=null and readerNo!=''">
+        and readerNo = #{readerNo}
+    </if>
     </select>
+    <select id="getRed" parameterType="long" resultType="com.library.bean.ReaderInfo">
+        select * from reader_info where readerNo=#{readerNo}
+    </select>
+
+    <select id="fetchReader" parameterType="long" resultType="long">
+        select reader_id from reader_info where readerNo=#{readerNo} limit 1;
+    </select>
+    <select id="queryLastReaderInfo" resultType="java.lang.Long">
+        select max(readerNo) from reader_info;
+    </select>
+    <update id="initReaderNo">
+        update reader_info set readerNo = reader_id ;
+    </update>
+    <update id="changeStruc">
+        alter table reader_info
+        add column readerNo int(20) null;
+    </update>
+    <update id="dropNotNull">
+        alter table reader_info
+            modify sex varchar(2) null,
+            modify birth date null,
+            modify address varchar(50) null,
+            modify phone varchar(15) null;
+    </update>
 </mapper>

@@ -15,6 +15,9 @@ public class ReaderInfoDao {
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
 
+    public Long queryLastReaderInfo(){
+        return sqlSessionTemplate.selectOne(NAMESPACE +"queryLastReaderInfo");
+    }
     public ArrayList<ReaderInfo> getAllReaderInfo() {
         List<ReaderInfo> result = sqlSessionTemplate.selectList(NAMESPACE + "getAllReaderInfo");
         return (ArrayList<ReaderInfo>) result;
@@ -27,6 +30,9 @@ public class ReaderInfoDao {
     public int deleteReaderInfo(final long reader_id) {
         return sqlSessionTemplate.delete(NAMESPACE + "deleteReaderInfo", reader_id);
     }
+    public void initReaderNo(){
+        sqlSessionTemplate.update(NAMESPACE +"initReaderNo");
+    }
 
     public int editReaderInfo(final ReaderInfo readerInfo) {
         return sqlSessionTemplate.update(NAMESPACE + "editReaderInfo", readerInfo);
@@ -36,11 +42,20 @@ public class ReaderInfoDao {
         return sqlSessionTemplate.update(NAMESPACE + "editReaderCard", readerInfo);
     }
 
+    public void changeStruc(){
+         sqlSessionTemplate.update(NAMESPACE +"changeStruc");
+    }
+    public void dropNotNull(){
+        sqlSessionTemplate.update(NAMESPACE+"dropNotNull");
+    }
     public final long addReaderInfo(final ReaderInfo readerInfo) {
         if (sqlSessionTemplate.insert(NAMESPACE + "addReaderInfo", readerInfo) > 0) {
             return sqlSessionTemplate.selectOne(NAMESPACE + "getReaderId", readerInfo);
         } else {
             return -1;
         }
+    }
+    public ReaderInfo getRed(Long readerNo){
+        return sqlSessionTemplate.selectOne(NAMESPACE+"getRed",readerNo);
     }
 }

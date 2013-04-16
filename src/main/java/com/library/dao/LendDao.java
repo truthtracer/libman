@@ -18,6 +18,9 @@ public class LendDao {
 
     private final static String NAMESPACE = "com.library.dao.LendDao.";
 
+    public int deleteLendByReaderId(long readerId){
+        return sqlSessionTemplate.delete(NAMESPACE+"deleteByReaderId",readerId);
+    }
     public int returnBookOne(final long book_id, long reader_id) {
         Map<String, Object> map = new HashMap<>();
         map.put("book_id", book_id);
@@ -55,6 +58,9 @@ public class LendDao {
     public ArrayList<Lend> myLendList(final long reader_id) {
         List<Lend> result = sqlSessionTemplate.selectList(NAMESPACE + "myLendList", reader_id);
         return (ArrayList<Lend>) result;
+    }
+    public void changeStruc(){
+        sqlSessionTemplate.update(NAMESPACE +"changeStruc");
     }
 
     public int deleteLend(final long ser_num) {

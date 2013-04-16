@@ -58,7 +58,7 @@ background-attachment: fixed;">
         </div>
 
         <p style="text-align: right;color: red;position: absolute" id="info"></p><br/>
-        <button id="loginButton"  class="btn btn-primary  btn-block">登陆
+        <button id="loginButton"  class="btn btn-primary  btn-block">登录
         </button>
     </div>
 </div>
@@ -123,7 +123,7 @@ background-attachment: fixed;">
                         if (data.stateCode.trim() === "0") {
                             $("#info").text("提示:账号或密码错误！");
                         } else if (data.stateCode.trim() === "1") {
-                            $("#info").text("提示:登陆成功，跳转中...");
+                            $("#info").text("提示:登录成功，跳转中...");
                             window.location.href="admin_main.html";
                         } else if (data.stateCode.trim() === "2") {
                             if(remember){
@@ -131,7 +131,7 @@ background-attachment: fixed;">
                             }else {
                                 Cookies.remove('loginStatus');
                             }
-                            $("#info").text("提示:登陆成功，跳转中...");
+                            $("#info").text("提示:登录成功，跳转中...");
                             window.location.href="reader_main.html";
 
                         }

@@ -25,8 +25,9 @@ background-attachment: fixed;">
         <div class="panel-body">
             <form action="reader_edit_do_r.html" method="post" id="edit" >
                 <div class="input-group">
-                    <span  class="input-group-addon">读者证号</span>
-                    <input type="text" readonly="readonly" class="form-control" name="readerId" id="readerId" value="${readerinfo.readerId}">
+                    <span  class="input-group-addon">读者号</span>
+                    <input type="hidden" value="${readerinfo.readerId}" name="readerId"/>
+                    <input type="text" readonly="readonly" class="form-control" name="readerNo" id="readerNo" value="${readerinfo.readerNo}">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon">姓名</span>

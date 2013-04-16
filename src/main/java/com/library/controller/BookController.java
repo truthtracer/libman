@@ -80,9 +80,9 @@ public class BookController {
     }
 
     @RequestMapping("/querybook.html")
-    public ModelAndView queryBookDo(String searchWord,Integer choice,int pageNum,int pageSize) {
+    public ModelAndView queryBookDo(String searchWord,Integer choice,Integer status,int pageNum,int pageSize) {
         if (bookService.matchBook(searchWord,choice)) {
-            ArrayList<Book> books = bookService.queryBook(searchWord,choice,pageSize,pageNum);
+            ArrayList<Book> books = bookService.queryBook(searchWord,choice,status,pageSize,pageNum);
             ModelAndView modelAndView = new ModelAndView("admin_books");
             ArrayList<BookVo> bookVos = new ArrayList<>();
             for(Book bk : books){
@@ -93,7 +93,8 @@ public class BookController {
             }
             modelAndView.addObject("books", bookVos);
             modelAndView.addObject("choice",choice);
-            int total = bookService.queryBookCount(searchWord,choice);
+            modelAndView.addObject("status",status);
+            int total = bookService.queryBookCount(searchWord,choice,status);
             modelAndView.addObject("total",total);
             modelAndView.addObject("pageNum",pageNum);
             modelAndView.addObject("pageSize", pageSize);
@@ -102,6 +103,7 @@ public class BookController {
         } else {
             ModelAndView mv= new ModelAndView("admin_books", "error", "没有匹配的图书");
             mv.addObject("choice",choice);
+            mv.addObject("status",status);
             return mv;
         }
     }
@@ -125,7 +127,7 @@ public class BookController {
             modelAndView.addObject("books", books);
             modelAndView.addObject("myLendList", myLendList);
             modelAndView.addObject("choice",choice);
-            int total = bookService.queryBookCount(searchWord,choice);
+            int total = bookService.queryBookCount(searchWord,choice,null);
             modelAndView.addObject("total",total);
             modelAndView.addObject("pageNum",pageNum);
             modelAndView.addObject("pageSize", pageSize);
@@ -178,7 +180,7 @@ public class BookController {
         ArrayList<Book> books = bookService.getAllBooks(book);
         ModelAndView modelAndView = new ModelAndView("admin_books");
         ArrayList<BookVo> bookVos = new ArrayList<>();
-        int total = bookService.queryBookCount(null,null);
+        int total = bookService.queryBookCount(null,null,null);
 
         for(Book bk : books){
             BookVo bookVo=new BookVo();
@@ -385,7 +387,7 @@ public class BookController {
         ModelAndView modelAndView = new ModelAndView("reader_books");
         modelAndView.addObject("books", books);
         modelAndView.addObject("myLendList", myLendList);
-        int total = bookService.queryBookCount(null,null);
+        int total = bookService.queryBookCount(null,null,null);
 
         modelAndView.addObject("total",total);
         modelAndView.addObject("pageNum",pageNum);

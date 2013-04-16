@@ -1,7 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt"%>
+
 <html>
 <head>
-    <title>编辑读者信息《 ${readerInfo.readerId}》</title>
+    <title>编辑读者信息《 ${readerInfo.readerNo}》</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/jquery-3.2.1.js"></script>
     <script src="js/bootstrap.min.js" ></script>
@@ -18,11 +20,12 @@ background-attachment: fixed;">
 <div class="col-xs-6 col-md-offset-3" style="position: relative;">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title">编辑读者信息《 ${readerInfo.readerId}》</h3>
+            <h3 class="panel-title">编辑读者信息《 ${readerInfo.readerNo}》</h3>
         </div>
         <div class="panel-body">
             <form action="reader_edit_do.html?readerId=${readerInfo.readerId}" method="post" id="readeredit" >
                 <div class="input-group">
+                    <input type="hidden" value="${readerInfo.readerNo}" />
                     <span class="input-group-addon">姓名</span>
                     <input type="text" class="form-control" name="name" id="name" value="${readerInfo.name}" >
                 </div>
@@ -32,7 +35,7 @@ background-attachment: fixed;">
                 </div>
                 <div class="input-group">
                     <span class="input-group-addon">生日</span>
-                    <input type="text" class="form-control" name="birth" id="birth"  value="${readerInfo.birth}" >
+                    <input type="text" class="form-control" name="birth" id="birth"  value='<fmt:formatDate pattern="yyyy-MM-dd" value="${readerInfo.birth}" /> ' >
                 </div>
                 <div class="input-group">
                     <span  class="input-group-addon">地址</span>
