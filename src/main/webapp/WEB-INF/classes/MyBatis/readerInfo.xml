@@ -26,18 +26,18 @@
     <select id="getReaderId" resultType="long" parameterType="com.library.bean.ReaderInfo">
         select reader_id from reader_info where
         name = #{name}
-         <if test="sex!=null and sex!=''"> and  sex = #{sex} </if>
+    <if test="sex!=null and sex!=''"> and  sex = #{sex} </if>
 
     <if test="address!=null and address!=''"> and address = #{address} </if>
      <if test="phone!=null and phone !='' ">
         and phone = #{phone}
      </if>
-<if test="readerNo!=null and readerNo!=''">
-    and readerNo = #{readerNo}
-</if>
+    <if test="readerNo!=null and readerNo!=''">
+        and readerNo = #{readerNo}
+    </if>
     </select>
     <select id="getRed" parameterType="long" resultType="com.library.bean.ReaderInfo">
-select*from reader_info where readerNo=#{readerNo}
+        select * from reader_info where readerNo=#{readerNo}
     </select>
 
     <select id="fetchReader" parameterType="long" resultType="long">
