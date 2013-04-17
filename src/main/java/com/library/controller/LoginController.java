@@ -64,7 +64,7 @@ public class LoginController {
             res.put("msg", "管理员登陆成功！");
         } else if (isReader) {
             ReaderInfo rdIf=readerInfoService.getRed(id);
-            Long rdid=0L;
+            long rdid=0L;
             if(rdIf!= null){
                 rdid = rdIf.getReaderId();
             }
