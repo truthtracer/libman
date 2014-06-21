@@ -75,10 +75,8 @@ background-attachment: fixed;">
         <input type="submit" value="添加" class="btn btn-success btn-sm" class="text-left">
         <script>
             $("#addbook").submit(function () {
-                if ($("#name").val() == '' || $("#author").val() == '' || $("#publish").val() == ''
-                    || $("#isbn").val() == '' || $("#introduction").val() == '' || $("#language").val() == ''
-                    || $("#price").val() == '' || $("#pressmark").val() == '' || $("#number").val() == '') {
-                    alert("请填入完整图书信息！");
+                if ($("#name").val() == '' ) {
+                    alert("请填入图书名称！");
                     return false;
                 }
             })
