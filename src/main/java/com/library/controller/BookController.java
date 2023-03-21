@@ -1,11 +1,13 @@
 package com.library.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.library.bean.Book;
 import com.library.bean.Lend;
 import com.library.bean.ReaderCard;
 import com.library.dto.AjaxResp;
 import com.library.dto.BookDto;
 import com.library.service.BookService;
+import com.library.service.ClazzService;
 import com.library.service.IsBnApiService;
 import com.library.service.LendService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,27 +35,39 @@ public class BookController {
     private LendService lendService;
     @Autowired
     private IsBnApiService isBnApiService;
-    private Date getDate(String pubstr) {
+    @Autowired
+    private ClazzService clazzService;
+
+    private String getDate(String pubstr) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            return df.parse(pubstr);
+            Date d= df.parse(pubstr);
+            return df.format(d);
         } catch (ParseException e) {
             e.printStackTrace();
-            return new Date();
+            return df.format(new Date());
         }
     }
-    @RequestMapping(value = "/query/book/{isbn}",method = RequestMethod.GET)
-    @ResponseBody
-    public AjaxResp<Book> queryBook(@PathVariable String isbn){
+
+    @RequestMapping(value = "/query/book/{isbn}",method = RequestMethod.GET )
+    public void queryBook(@PathVariable String isbn, HttpServletResponse response){
         try {
-            Book bk =  isBnApiService.queryByIsbn(isbn);
-            if(bk != null)
-                return new AjaxResp<>(200,"ok",bk);
-            else
-                return new AjaxResp<>(500,"fail",null);
+            Book bk = isBnApiService.queryByIsbn(isbn);
+            AjaxResp<Book> ajaxResp = null;
+            if(bk != null) {
+                ajaxResp = new AjaxResp<>(200, "ok", bk);
+            }else {
+                ajaxResp = new AjaxResp<>(500, "fail", null);
+            }
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().print(JSON.toJSONString(ajaxResp));
         }catch (Exception e){
             log.error("query book failed",e);
-            return new AjaxResp<>(500,"fail",null);
+            try {
+                response.getWriter().print(JSON.toJSONString( new AjaxResp<>(500,"fail",null)));
+            } catch (IOException ioException) {
+               log.error("exception", ioException);
+            }
         }
     }
 
@@ -109,12 +125,14 @@ public class BookController {
 
     @RequestMapping("/book_add.html")
     public ModelAndView addBook() {
-        return new ModelAndView("admin_book_add");
+        ModelAndView mv= new ModelAndView("admin_book_add");
+        mv.addObject("clazzList",clazzService.getAll());
+        return mv;
     }
 
     @RequestMapping("/book_add_do.html")
     public String addBookDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {
-        book.setPubdate(getDate(pubstr));
+        book.setPub_date(getDate(pubstr));
         if (bookService.addBook(book)) {
             redirectAttributes.addFlashAttribute("succ", "图书添加成功！");
         } else {
@@ -134,7 +152,7 @@ public class BookController {
 
     @RequestMapping("/book_edit_do.html")
     public String bookEditDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {
-        book.setPubdate(getDate(pubstr));
+        book.setPub_date(getDate(pubstr));
         if (bookService.editBook(book)) {
             redirectAttributes.addFlashAttribute("succ", "图书修改成功！");
         } else {

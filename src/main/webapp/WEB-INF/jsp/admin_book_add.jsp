@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -38,7 +39,7 @@ background-attachment: fixed;">
         <div class="form-group">
             <label for="isbn">ISBN</label>
             <input type="text" class="form-control" name="isbn" id="isbn" placeholder="请输入ISBN">
-            <input type="button" name="btnAuto" id="btnAuto" onclick="queryBook()" value="查询信息"/>
+            <input type="button" name="btnAuto" id="btnAuto" onclick="queryBook()" value="自动填充"/>
         </div>
         <div class="form-group">
             <label for="introduction">简介</label>
@@ -58,8 +59,13 @@ background-attachment: fixed;">
             <input type="date" class="form-control" name="pubstr" id="pubstr" placeholder="请输入出版日期">
         </div>
         <div class="form-group">
-            <label for="classId">分类号</label>
-            <input type="text" class="form-control" name="classId" id="classId" placeholder="请输入分类号">
+            <label for="classId">分类</label>
+            <select  class="form-control" name="classId" id="classId">
+                    <option value="">--选择分类--</option>
+                    <c:forEach items="${clazzList}" var="clz">
+                        <option value="${clz.class_id}">${clz.class_name}</option>
+                    </c:forEach>
+            </select>
         </div>
         <div class="form-group">
             <label for="number">数量</label>
@@ -78,11 +84,19 @@ background-attachment: fixed;">
             function queryBook(){
                 var isbn=$("#isbn").val();
                 $.ajax({
-                   url:"/query/book/"+isbn,
+                   url:"query/book/"+isbn,
                    method:"get",
-                    success:function(data){
+                   dataType:"json",
+                   contentType:"application/json;charset=utf-8",
+                   success:function(data){
                        if(data.code == 200){
-                           $("#author").val(data.author);
+                           $("#author").val(data.data.author);
+                           $("#name").val(data.data.name);
+                           $("#publish").val(data.data.publish);
+                           $("#introduction").text(data.data.introduction);
+                           $("#language").val(data.data.language);
+                           $("#price").val(data.data.price);
+                           $("#pubstr").val(data.data.pub_date);
                        }else{
                            alert(data.msg);
                        }

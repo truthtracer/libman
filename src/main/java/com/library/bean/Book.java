@@ -14,7 +14,7 @@ public class Book implements Serializable {
     private String introduction;
     private String language;
     private BigDecimal price;
-    private Date pub_date;
+    private String pub_date;
     private int class_id;
     private int number;
 
@@ -82,11 +82,11 @@ public class Book implements Serializable {
         this.price = price;
     }
 
-    public Date getPubdate() {
+    public String getPub_date() {
         return pub_date;
     }
 
-    public void setPubdate(Date pub_date) {
+    public void setPub_date(String pub_date) {
         this.pub_date = pub_date;
     }
 
