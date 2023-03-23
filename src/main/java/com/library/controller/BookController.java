@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.library.bean.Book;
+import com.library.bean.ClassInfo;
 import com.library.bean.Lend;
 import com.library.bean.ReaderCard;
 import com.library.dto.AjaxResp;
@@ -132,7 +133,7 @@ public class BookController {
 
     @RequestMapping("/book_add_do.html")
     public String addBookDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {
-        book.setPub_date(getDate(pubstr));
+        book.setPubdate(getDate(pubstr));
         if (bookService.addBook(book)) {
             redirectAttributes.addFlashAttribute("succ", "图书添加成功！");
         } else {
@@ -147,12 +148,13 @@ public class BookController {
         Book book = bookService.getBook(bookId);
         ModelAndView modelAndView = new ModelAndView("admin_book_edit");
         modelAndView.addObject("detail", book);
+        modelAndView.addObject("clazzList",clazzService.getAll());
         return modelAndView;
     }
 
     @RequestMapping("/book_edit_do.html")
     public String bookEditDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {
-        book.setPub_date(getDate(pubstr));
+        book.setPubdate(getDate(pubstr));
         if (bookService.editBook(book)) {
             redirectAttributes.addFlashAttribute("succ", "图书修改成功！");
         } else {
@@ -165,6 +167,8 @@ public class BookController {
     public ModelAndView adminBookDetail(HttpServletRequest request) {
         long bookId = Long.parseLong(request.getParameter("bookId"));
         Book book = bookService.getBook(bookId);
+        ClassInfo clz= clazzService.getByID(book.getClassId());
+        book.setClassName(clz == null ? "" : clz.getClass_name());
         ModelAndView modelAndView = new ModelAndView("admin_book_detail");
         modelAndView.addObject("detail", book);
         return modelAndView;
@@ -174,6 +178,8 @@ public class BookController {
     public ModelAndView readerBookDetail(HttpServletRequest request) {
         long bookId = Long.parseLong(request.getParameter("bookId"));
         Book book = bookService.getBook(bookId);
+        ClassInfo clz = clazzService.getByID(book.getClassId());
+        book.setClassName(clz == null ? "": clz.getClass_name());
         ModelAndView modelAndView = new ModelAndView("reader_book_detail");
         modelAndView.addObject("detail", book);
         return modelAndView;

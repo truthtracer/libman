@@ -8,4 +8,8 @@
     <select id="getAll" resultMap="rstMap">
         SELECT * FROM class_info
     </select>
+
+    <select id="getById" resultMap="rstMap">
+        select * from class_info where class_id=#{id}
+    </select>
 </mapper>

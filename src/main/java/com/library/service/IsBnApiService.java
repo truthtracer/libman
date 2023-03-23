@@ -145,7 +145,7 @@ public class IsBnApiService {
                         bk.setIntroduction(detail.getGist());
                         bk.setLanguage(detail.getLanguage());
                         bk.setPrice(detail.getPrice());
-                        bk.setPub_date(org.springframework.util.StringUtils.isEmpty(detail.getPubDate()) ?
+                        bk.setPubdate(org.springframework.util.StringUtils.isEmpty(detail.getPubDate()) ?
                                 "" :
                                 (detail.getPubDate().length() == 6 ?
                                     detail.getPubDate().substring(0,4)+"-"+ detail.getPubDate().substring(4, detail.getPubDate().length())+"-01"
