@@ -1,10 +1,7 @@
 package com.library.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.library.bean.Book;
-import com.library.bean.ClassInfo;
-import com.library.bean.Lend;
-import com.library.bean.ReaderCard;
+import com.library.bean.*;
 import com.library.dto.AjaxResp;
 import com.library.dto.BookDto;
 import com.library.service.BookService;
@@ -53,13 +50,12 @@ public class BookController {
     @RequestMapping(value = "/query/book/{isbn}",method = RequestMethod.GET )
     public void queryBook(@PathVariable String isbn, HttpServletResponse response){
         try {
-            Book bk = isBnApiService.queryByIsbn(isbn);
+            BookAutoRequestVo vo = isBnApiService.queryByIsbn(isbn);
             AjaxResp<Book> ajaxResp = null;
-            if(bk != null) {
-                ajaxResp = new AjaxResp<>(200, "ok", bk);
-            }else {
-                ajaxResp = new AjaxResp<>(500, "fail", null);
-            }
+            if(vo.getCode() != null && vo.getCode().equals(100))
+                 ajaxResp = new AjaxResp<>(200, "ok", vo.getBook());
+            else
+                ajaxResp=new AjaxResp<>(500,vo.getMsg(),null);
             response.setContentType("application/json;charset=UTF-8");
             response.getWriter().print(JSON.toJSONString(ajaxResp));
         }catch (Exception e){
