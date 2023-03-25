@@ -11,7 +11,8 @@
         alter table book_info
             modify `name` varchar(100),
             modify author varchar(100),
-            modify publish varchar(100);
+            modify publish varchar(100),
+            modify pub_date varchar(30);
     </update>
     <update id="editBook" parameterType="com.library.bean.Book">
         update book_info set name=#{name}, author=#{author},
@@ -61,4 +62,7 @@
     <delete id="deleteBook" parameterType="long">
         delete from book_info where book_id = #{book_id}
     </delete>
+    <select id="queryByIsbn" resultType="com.library.bean.Book">
+        select * from book_info where isbn=#{isbn}
+    </select>
 </mapper>

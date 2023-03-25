@@ -38,7 +38,7 @@ background-attachment: fixed;">
         </div>
         <div class="form-group">
             <label for="isbn">ISBN</label>
-            <input type="text" class="form-control" name="isbn" id="isbn" placeholder="请输入ISBN">
+            <input type="text" oninput="check()" class="form-control" name="isbn" id="isbn" placeholder="请输入ISBN">
             <input type="button" name="btnAuto" id="btnAuto" onclick="queryBook()" value="自动填充"/>
         </div>
         <div class="form-group">
@@ -82,6 +82,28 @@ background-attachment: fixed;">
                     return false;
                 }
             })
+            function check(){
+                var isbn=$("#isbn").val().trim();
+                if(isbn === "" ){
+                    return;
+                }
+                if(isbn.length < 10){
+                    return;
+                }
+                $.ajax({
+                    url:"query/book/exists/"+isbn,
+                    method:"get",
+                    dataType:"json",
+                    contentType:"application/json;charset=utf-8",
+                    success:function(data){
+                        if(data.code == 500){
+                            alert("图书已存在");
+                        }else if(data.code==501){
+                            alert("fail");
+                        }
+                    }
+                });
+            }
 
             function queryBook(){
                 var isbn=$("#isbn").val().trim();

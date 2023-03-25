@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-
+import java.util.List;
 @Service
 
 public class BookService {
@@ -16,6 +16,9 @@ public class BookService {
     private BookDao bookDao;
     private Logger log = Logger.getLogger(this.getClass());
 
+    public List<Book> queryBook(String isbn){
+     return bookDao.queryBookByIsbn(isbn);
+    }
     public ArrayList<Book> queryBookForReader(String searchWord,Integer choice){
         String search = null;
         if(searchWord != null){

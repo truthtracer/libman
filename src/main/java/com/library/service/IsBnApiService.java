@@ -3,26 +3,39 @@ package com.library.service;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Resource;
 
+import com.library.bean.Batch;
 import com.library.bean.Book;
 import com.library.bean.BookAutoRequestVo;
+import com.library.dao.BatchDao;
+import com.library.dao.BookDao;
+import com.library.dto.QueryByIsBnDto;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class IsBnApiService {
+    Timer timer = new Timer();
     @Autowired
     private Propert propert;
-    String source = "market";
+    @Autowired
+    private BookDao bookDao;
+
+    @Autowired
+    private BatchDao batchDao;
     @Resource
     private RestTemplate restTemplate;
     private Logger log = Logger.getLogger(this.getClass());
+//    CompletionService<BookAutoRequestVo> completionService= new ExecutorCompletionService<>(Executors.newFixedThreadPool(5));
 
 //    public String init(String datetime) {
 //        try {
@@ -53,6 +66,79 @@ public class IsBnApiService {
             ));
         }
         return sb.toString();
+    }
+
+
+    public boolean batchQueryByIsbn(final List<String> isbns){
+        if(isbns.size()==0){
+            return false;
+        }
+        try {
+            final AtomicInteger atomicInteger = new AtomicInteger(0);
+            final int perBatch = 4;
+            int pgsize = isbns.size() % perBatch == 0 ? isbns.size() / perBatch : isbns.size() / perBatch + 1;
+            List<List<String>> listList = new ArrayList<>();
+            for (int i = 0; i < pgsize; i++) {
+                int end = (i + 1) * perBatch;
+                if (end >= isbns.size()) {
+                    end = isbns.size() ;
+                }
+                listList.add(isbns.subList(i * perBatch, end));
+            }
+            TimerTask t=new TimerTask() {
+                @Override
+                public void run() {
+                    int idx=atomicInteger.getAndAdd(1);
+                    List<String> lst = listList.get( idx == listList.size() ? idx-1
+                            : idx);
+                    if(atomicInteger.get() > listList.size()){
+                        this.cancel();
+                    }
+                    for (String temp : lst) {
+                        BookAutoRequestVo bookAutoRequestVo = CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))?
+                                queryByIsbn(temp) : null;
+                        if(bookAutoRequestVo == null){
+                            Batch batch = new Batch();
+                            batch.setIsbn(temp);
+                            batch.setStatus(1);
+                            batch.setFailCause("");
+                            batchDao.updateByIsbn(batch);
+                            continue;
+                        }
+                        if (bookAutoRequestVo.getCode().equals(100)) {
+                            if (bookAutoRequestVo.getBook() != null) {
+                                Book bk = bookAutoRequestVo.getBook();
+                                bk.setLanguage("中文");
+                                bk.setNumber(1);
+                                if(CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))) {
+                                    bookDao.addBook(bk);
+                                }
+
+                                Batch batch = new Batch();
+                                batch.setIsbn(temp);
+                                batch.setStatus(1);
+                                batch.setFailCause("");
+                                batchDao.updateByIsbn(batch);
+                            }
+                        }else{
+                            Batch batch=new Batch();
+                            batch.setIsbn(temp);
+                            batch.setStatus(0);//.getCode());
+                            batch.setFailCause(bookAutoRequestVo.getMsg());
+                            batchDao.updateByIsbn(batch);
+                        }
+                    }
+                }
+            };
+            timer.schedule(t,500,1000);
+//            sc.scheduleWithFixedDelay(() -> {
+//
+//            }, 1000, 1000, TimeUnit.SECONDS);
+            return true;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return false;
+        }
     }
 
     public BookAutoRequestVo queryByIsbn(final String isbn){

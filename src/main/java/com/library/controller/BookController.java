@@ -4,23 +4,27 @@ import com.alibaba.fastjson.JSON;
 import com.library.bean.*;
 import com.library.dto.AjaxResp;
 import com.library.dto.BookDto;
-import com.library.service.BookService;
-import com.library.service.ClazzService;
-import com.library.service.IsBnApiService;
-import com.library.service.LendService;
+import com.library.service.*;
+import com.library.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 @Controller
@@ -35,6 +39,8 @@ public class BookController {
     private IsBnApiService isBnApiService;
     @Autowired
     private ClazzService clazzService;
+    @Autowired
+    private BatchService batchService;
 
     private String getDate(String pubstr) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -100,6 +106,35 @@ public class BookController {
         }
     }
 
+    @RequestMapping(value = "/query/book/exists/{isbn}",method = RequestMethod.GET )
+    public void queryIsbnBook(@PathVariable String isbn, HttpServletResponse response){
+        try {
+            List<Book> vo = bookService.queryBook(isbn);
+            AjaxResp<Book> ajaxResp = null;
+            if(CollectionUtils.isEmpty(vo))
+                ajaxResp = new AjaxResp<>(200, "ok", null);
+            else
+                ajaxResp=new AjaxResp<>(500, "exists",null);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().print(JSON.toJSONString(ajaxResp));
+        }catch (Exception e){
+            log.error("query book failed",e);
+            try {
+                response.getWriter().print(JSON.toJSONString( new AjaxResp<>(501,"fail",null)));
+            } catch (IOException ioException) {
+                log.error("exception", ioException);
+            }
+        }
+    }
+
+    @RequestMapping("/admin_books_look_progress.html")
+    public ModelAndView lookProgress(){
+        ModelAndView mv= new ModelAndView("look_progress");
+        List<BatchResult> batchResult= batchService.findResult();
+        mv.addObject("batchProgress",batchResult);
+        return mv;
+    }
+
     @RequestMapping("/admin_books.html")
     public ModelAndView adminBooks() {
         final int pageSize=10;
@@ -126,6 +161,32 @@ public class BookController {
         mv.addObject("clazzList",clazzService.getAll());
         return mv;
     }
+    @RequestMapping("/book_add_batch.html")
+    public ModelAndView addBatchBook(){
+        return new ModelAndView("admin_book_add_batch");
+    }
+
+    @RequestMapping("/book_batch_add_do.html")
+    public String batchAdd(HttpServletRequest req,RedirectAttributes redirectAttributes) {
+        try {
+            ServletInputStream inputStream = req.getInputStream();
+            try {
+                List<String> list = FileUtils.readFile(inputStream);
+                list = batchService.insertBatchLst(list);
+                isBnApiService.batchQueryByIsbn(list);
+                redirectAttributes.addFlashAttribute("succ", "已经提交队列！");
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
+                redirectAttributes.addFlashAttribute("succ", "提交队列失败！");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("succ", "提交队列失败！");
+        }
+        return "redirect:/admin_books_look_progress.html";
+    }
+
+
 
     @RequestMapping("/book_add_do.html")
     public String addBookDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {

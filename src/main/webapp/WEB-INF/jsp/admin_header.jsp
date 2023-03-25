@@ -16,6 +16,8 @@
                         <li><a href="admin_books.html">全部图书</a></li>
                         <li class="divider"></li>
                         <li><a href="book_add.html">增加图书</a></li>
+                        <li><a href="book_add_batch.html">批量增加图书</a></li>
+                        <li><a href="admin_books_look_progress.html">查看批量新增进度</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
