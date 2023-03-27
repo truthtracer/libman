@@ -60,6 +60,7 @@ background-attachment: fixed;">
             <td>处理中</td>
             <td>成功</td>
             <td>失败</td>
+            <td>超时响应（需要重新导入的）</td>
         </tr>
     <c:forEach items="${batchProgress}" var="p">
         <tr>
@@ -68,6 +69,7 @@ background-attachment: fixed;">
             <td>${p.handling}</td>
             <td>${p.success}</td>
             <td>${p.fail}</td>
+            <td>${p.timeout}</td>
         </tr>
     </c:forEach>
     </table>

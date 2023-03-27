@@ -33,6 +33,7 @@ public class BatchService {
         List<Result> handlingResult= batchDao.findHandlingResult();
         List<Result> successResult= batchDao.findSuccessResult();
         List<Result> failedResult = batchDao.findFailResult();
+        List<Result> timeoutResult = batchDao.findTimeoutResult();
         List<BatchResult> allRs=new ArrayList<>();
         for(Result rs : allResult){
             BatchResult batchResult = new BatchResult();
@@ -43,6 +44,13 @@ public class BatchService {
                 batchResult.setHandling(op.get().getCt());
             else
                 batchResult.setHandling(0);
+
+            Optional<Result> timeOutOp = timeoutResult.stream().filter(r->r.getBatchNo().equals(rs.getBatchNo())).findFirst();
+            if(timeOutOp.isPresent()){
+                batchResult.setTimeout(timeOutOp.get().getCt());
+            }else{
+                batchResult.setTimeout(0);
+            }
 
             Optional<Result> opSuccess=successResult.stream().filter(r->r.getBatchNo().equals(rs.getBatchNo())).findFirst();
             opSuccess.ifPresent(result -> batchResult.setSuccess(result.getCt()));
