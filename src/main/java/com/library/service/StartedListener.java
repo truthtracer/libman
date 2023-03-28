@@ -2,6 +2,7 @@ package com.library.service;
 
 import com.library.dao.BatchDao;
 import com.library.dao.BookDao;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
@@ -28,6 +29,15 @@ public class StartedListener implements ServletContextListener{
         try{
             BatchDao batchDao = ac.getBean(BatchDao.class);
             batchDao.changeStruc();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        try{
+            BatchDao batchDao = ac.getBean(BatchDao.class);
+
+            batchDao.changePrimary();
+
         }catch (Exception e){
             e.printStackTrace();
         }

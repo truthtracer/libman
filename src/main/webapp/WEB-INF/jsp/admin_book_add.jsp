@@ -118,15 +118,19 @@ background-attachment: fixed;">
                    contentType:"application/json;charset=utf-8",
                    success:function(data){
                        if(data.code == 200){
-                           $("#author").val(data.data.author);
-                           $("#name").val(data.data.name);
-                           $("#publish").val(data.data.publish);
-                           $("#introduction").text(data.data.introduction);
-                           if(data.data.language) {
-                               $("#language").val(data.data.language);
+                           if(data.data) {
+                               $("#author").val(data.data.author);
+                               $("#name").val(data.data.name);
+                               $("#publish").val(data.data.publish);
+                               $("#introduction").text(data.data.introduction);
+                               if (data.data.language) {
+                                   $("#language").val(data.data.language);
+                               }
+                               $("#price").val(data.data.price);
+                               $("#pubstr").val(data.data.pubdate);
+                           }else{
+                               alert("未查到书籍信息");
                            }
-                           $("#price").val(data.data.price);
-                           $("#pubstr").val(data.data.pubdate);
                        }else{
                            alert(data.msg);
                        }

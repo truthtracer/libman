@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -69,8 +70,8 @@ public class IsBnApiService {
     }
 
 
-    public boolean batchQueryByIsbn(final List<String> isbns){
-        if(isbns.size()==0){
+    public boolean batchQueryByIsbn(final String batchNo,final List<String> isbns){
+        if(CollectionUtils.isEmpty(isbns)){
             return false;
         }
         try {
@@ -85,7 +86,7 @@ public class IsBnApiService {
                 }
                 listList.add(isbns.subList(i * perBatch, end));
             }
-            TimerTask t=new TimerTask() {
+            TimerTask t = new TimerTask() {
                 @Override
                 public void run() {
                     int idx = atomicInteger.getAndAdd(1);
@@ -95,13 +96,13 @@ public class IsBnApiService {
                     }
                     for (String temp : lst) {
                         try {
-                            BookAutoRequestVo bookAutoRequestVo = CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp)) ?
-                                    queryByIsbn(temp) : null;
+                            BookAutoRequestVo bookAutoRequestVo = CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp)) ? queryByIsbn(temp) : null;
                             if (bookAutoRequestVo == null) {
                                 Batch batch = new Batch();
                                 batch.setIsbn(temp);
                                 batch.setStatus(1);
                                 batch.setFailCause("");
+                                batch.setBatchNo(batchNo);
                                 batchDao.updateByIsbn(batch);
                                 continue;
                             }
@@ -110,6 +111,12 @@ public class IsBnApiService {
                                     Book bk = bookAutoRequestVo.getBook();
                                     bk.setLanguage("中文");
                                     bk.setNumber(1);
+                                    if(bk.getPrice() == null){
+                                        bk.setPrice(BigDecimal.ZERO);
+                                    }
+                                    if(StringUtils.isEmpty(bk.getIsbn())){
+                                        bk.setIsbn(temp);
+                                    }
                                     if (CollectionUtils.isEmpty(bookDao.queryBookByIsbn(temp))) {
                                         bookDao.addBook(bk);
                                     }
@@ -118,6 +125,16 @@ public class IsBnApiService {
                                     batch.setIsbn(temp);
                                     batch.setStatus(1);
                                     batch.setFailCause("");
+                                    batch.setBatchNo(batchNo);
+                                    batchDao.updateByIsbn(batch);
+                                }else{
+                                    String msg="not found book from api,isbn="+temp;
+                                    System.out.println(msg);
+                                    Batch batch = new Batch();
+                                    batch.setIsbn(temp);
+                                    batch.setStatus(2);
+                                    batch.setFailCause(msg);
+                                    batch.setBatchNo(batchNo);
                                     batchDao.updateByIsbn(batch);
                                 }
                             } else {
@@ -125,26 +142,27 @@ public class IsBnApiService {
                                 batch.setIsbn(temp);
                                 batch.setStatus(0);
                                 batch.setFailCause(bookAutoRequestVo.getMsg());
+                                batch.setBatchNo(batchNo);
                                 batchDao.updateByIsbn(batch);
                             }
                         }catch (Exception e){
                             log.error(e.getMessage(),e);
+                            System.out.println(e.getMessage()+e);
                             Batch batch=new Batch();
                             batch.setIsbn(temp);
-                            batch.setStatus(2);
+                            batch.setStatus(0);
                             batch.setFailCause(e.getMessage());
+                            batch.setBatchNo(batchNo);
                             batchDao.updateByIsbn(batch);
                         }
                     }
                 }
             };
             timer.schedule(t,500,1000);
-//            sc.scheduleWithFixedDelay(() -> {
-//
-//            }, 1000, 1000, TimeUnit.SECONDS);
             return true;
         }catch (Exception e){
             log.error(e.getMessage(),e);
+            System.out.println(e.getMessage()+e);
             return false;
         }
     }
@@ -152,22 +170,23 @@ public class IsBnApiService {
     public BookAutoRequestVo queryByIsbn(final String isbn){
         BookAutoRequestVo bvo = new BookAutoRequestVo();
         try {
-            Book bk = new Book();
+            Book bk = null;
             ResponseEntity<Map> resp = restTemplate.getForEntity("https://api.gugudata.com/text/isbn?appkey=" + propert.getAppkey() + "&isbn=" + isbn, Map.class);
             if(resp.getStatusCode().equals(HttpStatus.OK)){
                 Map<?,?> mp=resp.getBody();
                 if(mp.get("DataStatus")!= null){
                     Map m=(Map)mp.get("DataStatus");
                     Integer status=Integer.parseInt(m.get("StatusCode").toString());
-                    if(status==100){
-                        if(mp.get("Data")!= null){
+                    if(status == 100){
+                        if(mp.get("Data") != null){
+                            bk = new Book();
                             Map<?,?> map = (Map<?,?>)mp.get("Data");
-                            bk.setName(map.get("Title").toString());
+                            bk.setName(map.get("Title")==null ? "" : map.get("Title").toString());
                             if(bk.getName()!= null && bk.getName().length()>50){
                                 bk.setName(bk.getName().substring(0,50));
                             }
-                            bk.setIsbn(map.get("ISBN").toString());
-                            bk.setAuthor(map.get("Author").toString());
+                            bk.setIsbn(map.get("ISBN")==null?"":map.get("ISBN").toString());
+                            bk.setAuthor(map.get("Author")==null ? "" : map.get("Author").toString());
                             if(bk.getAuthor().contains("\n")){
                                 String[] arr=bk.getAuthor().split("\n");
                                 StringBuilder sb=new StringBuilder();
@@ -176,17 +195,16 @@ public class IsBnApiService {
                                 }
                                 bk.setAuthor(sb.toString());
                             }
-                            bk.setPublish(map.get("Publisher").toString());
+                            bk.setPublish(map.get("Publisher")==null?"": map.get("Publisher").toString());
                             if(map.get("PublisherDateTime")!= null) {
                                 bk.setPubdate(map.get("PublisherDateTime").toString());
                             }
                             if(map.get("BriefIntroduction")!=null){
                                 bk.setIntroduction(map.get("BriefIntroduction").toString());
                             }
-                            if(map.get("Price")!=null){
+                            if(map.get("Price") != null){
                                 bk.setPrice(new BigDecimal(map.get("Price").toString()));
                             }
-
                         }
                         bvo.setBook(bk);
                         bvo.setCode(status);
@@ -221,10 +239,14 @@ public class IsBnApiService {
                         bvo.setMsg("Interface internal response error");
                     }
                 }
+            }else{
+                System.out.println("api return:"+resp.getStatusCode());
             }
+            System.out.println("query return:"+bvo.getCode()+", "+bvo.getMsg());
             return bvo;
         }catch (Exception e) {
             log.error(e.getMessage(), e);
+            System.out.println(e.getMessage()+e);
             bvo.setCode(0);
             bvo.setMsg(e.getMessage());
             return bvo;

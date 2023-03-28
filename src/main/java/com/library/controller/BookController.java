@@ -191,9 +191,11 @@ public class BookController {
         try {
             ServletInputStream inputStream = req.getInputStream();
             try {
+                final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+                final String batchNo = sdf.format(new Date());
                 List<String> list = FileUtils.readFile(inputStream);
-                list = batchService.insertBatchLst(list);
-                isBnApiService.batchQueryByIsbn(list);
+                list = batchService.insertBatchLst(batchNo,list);
+                isBnApiService.batchQueryByIsbn(batchNo,list);
                 redirectAttributes.addFlashAttribute("succ", "已经提交队列！");
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);

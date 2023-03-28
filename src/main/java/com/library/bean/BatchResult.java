@@ -4,7 +4,7 @@ public class BatchResult {
     private int total;
     private int success;
     private int fail;
-    private int timeout;
+    private int notfound;
     private String batchNo;
     private int handling;
 
@@ -48,11 +48,11 @@ public class BatchResult {
         this.batchNo = batchNo;
     }
 
-    public int getTimeout() {
-        return timeout;
+    public int getNotfound() {
+        return notfound;
     }
 
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
+    public void setNotfound(int notfound) {
+        this.notfound = notfound;
     }
 }
