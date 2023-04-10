@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt"%>
 <html>
 <head>
     <title>借还日志</title>
@@ -61,8 +62,8 @@ background-attachment: fixed;">
                     <td><c:out value="${alog.ser_num}"></c:out></td>
                     <td><c:out value="${alog.bookId}"></c:out></td>
                     <td><c:out value="${alog.readerId}"></c:out></td>
-                    <td><c:out value="${alog.lendDate}"></c:out></td>
-                    <td><c:out value="${alog.backDate}"></c:out></td>
+                    <td><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${alog.lendDate}" /> </td>
+                    <td><fmt:formatDate pattern="yyyy-MM-dd HH:mm:ss" value="${alog.backDate}" /></td>
                     <td>
                         <a href="deletelend.html?serNum=<c:out value='${alog.ser_num}'></c:out>">
                             <c:if test="${!empty alog.backDate}">

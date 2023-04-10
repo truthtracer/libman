@@ -56,7 +56,6 @@ background-attachment: fixed;">
          }
 
         function  sub() {
-            // var val=$("#search").val();
             $("#hdnPage").val($("#selPgNm").val());
             $("#hdnPageSize").val($("#selPageSize").val());
             $("#searchform").submit();
@@ -99,6 +98,8 @@ background-attachment: fixed;">
                 <th>ISBN</th>
                 <th>价格</th>
                 <th>剩余数量</th>
+                <th>借出</th>
+                <th>归还</th>
                 <th>详情</th>
                 <th>编辑</th>
                 <th>删除</th>
@@ -113,6 +114,20 @@ background-attachment: fixed;">
                 <td><c:out value="${book.isbn}"></c:out></td>
                 <td><c:out value="${book.price}"></c:out></td>
                 <td><c:out value="${book.number}"></c:out></td>
+                <td>
+                    <c:if test="${book.number>0}">
+                        <a href="admin_book_lend.html?bookId=<c:out value="${book.bookId}"></c:out>">
+                            <button type="button" class="btn btn-success btn-xs">借出</button>
+                        </a>
+                    </c:if>
+                </td>
+                <td>
+                    <c:if test="${book.hasLendRecord==true}">
+                        <a href="admin_book_back.html?bookId=<c:out value="${book.bookId}"></c:out>">
+                            <button type="button" class="btn btn-success btn-xs">归还</button>
+                        </a>
+                    </c:if>
+                </td>
                 <td><a href="admin_book_detail.html?bookId=<c:out value="${book.bookId}"></c:out>">
                     <button type="button" class="btn btn-success btn-xs">详情</button>
                 </a></td>

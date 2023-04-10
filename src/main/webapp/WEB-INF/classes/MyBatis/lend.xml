@@ -13,7 +13,7 @@
         (null , #{book_id} , #{reader_id} , sysdate() , null)
     </insert>
     <update id="lendBookTwo" parameterType="long">
-        update book_info set number = number - 1 where book_id = #{book_id}
+        update book_info set number = number - 1 where book_id = #{book_id}  and number > 0;
     </update>
     <select id="lendList" resultType="com.library.bean.Lend">
         select * from lend_list
@@ -24,4 +24,10 @@
     <delete id="deleteLend" parameterType="long">
         delete from lend_list where ser_num = #{ser_num}
     </delete>
+    <select id="lendBookCount" resultType="int">
+        select count(*) from lend_list where  book_id = #{bookId} and back_date is null
+    </select>
+    <select id="lendListOfBook" parameterType="long" resultType="com.library.bean.Lend">
+        select * from lend_list where book_id = #{bookId} and back_date is null
+    </select>
 </mapper>

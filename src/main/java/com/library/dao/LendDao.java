@@ -25,6 +25,9 @@ public class LendDao {
         return sqlSessionTemplate.update(NAMESPACE + "returnBookOne", map);
     }
 
+    public int lendBookCount(final long bookId){
+        return sqlSessionTemplate.selectOne(NAMESPACE+"lendBookCount",bookId);
+    }
     public int returnBookTwo(final long book_id) {
         return sqlSessionTemplate.update(NAMESPACE + "returnBookTwo", book_id);
     }
@@ -45,6 +48,10 @@ public class LendDao {
         return (ArrayList<Lend>) result;
     }
 
+    public ArrayList<Lend> lendListOfBook(Long bookId){
+        List<Lend> result = sqlSessionTemplate.selectList(NAMESPACE + "lendListOfBook",bookId);
+        return (ArrayList<Lend>) result;
+    }
     public ArrayList<Lend> myLendList(final long reader_id) {
         List<Lend> result = sqlSessionTemplate.selectList(NAMESPACE + "myLendList", reader_id);
         return (ArrayList<Lend>) result;

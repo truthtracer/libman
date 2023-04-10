@@ -6,6 +6,9 @@ import com.library.dto.AjaxResp;
 import com.library.dto.BookDto;
 import com.library.service.*;
 import com.library.utils.FileUtils;
+import com.library.vo.BookVo;
+import com.library.vo.LendVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +44,8 @@ public class BookController {
     private ClazzService clazzService;
     @Autowired
     private BatchService batchService;
+    @Autowired
+    private ReaderInfoService readerInfoService;
 
     private String getDate(String pubstr) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -79,7 +84,14 @@ public class BookController {
         if (bookService.matchBook(searchWord,choice)) {
             ArrayList<Book> books = bookService.queryBook(searchWord,choice,pageSize,pageNum);
             ModelAndView modelAndView = new ModelAndView("admin_books");
-            modelAndView.addObject("books", books);
+            ArrayList<BookVo> bookVos = new ArrayList<>();
+            for(Book bk : books){
+                BookVo bookVo = new BookVo();
+                BeanUtils.copyProperties(bk, bookVo);
+                bookVo.setHasLendRecord(lendService.lendOrNot(bk.getBookId()));
+                bookVos.add(bookVo);
+            }
+            modelAndView.addObject("books", bookVos);
             modelAndView.addObject("choice",choice);
             int total = bookService.queryBookCount(searchWord,choice);
             modelAndView.addObject("total",total);
@@ -165,8 +177,16 @@ public class BookController {
 
         ArrayList<Book> books = bookService.getAllBooks(book);
         ModelAndView modelAndView = new ModelAndView("admin_books");
-        modelAndView.addObject("books", books);
+        ArrayList<BookVo> bookVos = new ArrayList<>();
         int total = bookService.queryBookCount(null,null);
+
+        for(Book bk : books){
+            BookVo bookVo=new BookVo();
+            BeanUtils.copyProperties(bk, bookVo);
+            bookVo.setHasLendRecord(lendService.lendOrNot(bk.getBookId()));
+            bookVos.add(bookVo);
+        }
+        modelAndView.addObject("books", bookVos);
 
         modelAndView.addObject("total",total);
         modelAndView.addObject("pageNum",pageNum);
@@ -208,7 +228,75 @@ public class BookController {
         return "redirect:/admin_books_look_progress.html";
     }
 
+    @RequestMapping("/admin_book_lend.html")
+    public ModelAndView adminBookLend(HttpServletRequest req){
+        ModelAndView mv = new ModelAndView("admin_lend");
+        try{
+            String bookIdStr = req.getParameter("bookId");
+            Book bk =bookService.getBook(Long.parseLong(bookIdStr));
+            mv.addObject("detail",  bk);
+            if(bk.getNumber() < 1){
+                mv.addObject("succ", "没有库存了，借阅失败");
+                mv.setViewName("admin_books");
+            }else{
+                mv.addObject("readList",readerInfoService.readerInfos());
+            }
+            return mv;
+        }catch (Exception ex){
+            log.warn("admin book lend failed",ex);
+        }
+        return mv;
+    }
 
+    @RequestMapping("/admin_book_back.html")
+    public ModelAndView adminBookBack(HttpServletRequest req){
+        Long bookId = Long.parseLong(req.getParameter("bookId"));
+        Book bk = bookService.getBook(bookId);
+        ArrayList<Lend> lst = lendService.lendListOfBook(bookId);
+        ArrayList<LendVo> list = new ArrayList<>();
+        for(Lend lend : lst){
+            LendVo lendVo = new LendVo();
+            BeanUtils.copyProperties(lend, lendVo);
+            ReaderInfo ri = readerInfoService.getReaderInfo(lend.getReaderId());
+            if(ri != null)
+                lendVo.setReaderName(ri.getName());
+            lendVo.setReaderCardNo(lend.getReaderId());
+            list.add(lendVo);
+        }
+        ModelAndView mv = new ModelAndView("admin_reader_lend_list","list", list);
+        mv.addObject("detail",bk);
+        return mv;
+    }
+
+    @RequestMapping("/admin_back_of_book.html")
+    public String backOfBook(HttpServletRequest request,RedirectAttributes redirectAttributes){
+        long bookId = Long.parseLong(request.getParameter("bookId"));
+        long readerId = Long.parseLong(request.getParameter("readerId"));
+        if (lendService.returnBook(bookId, readerId)) {
+            redirectAttributes.addFlashAttribute("succ", "归还成功");
+            return "redirect:/admin_books.html";
+        }else {
+            redirectAttributes.addFlashAttribute("succ", "归还失败");
+            return "redirect:/admin_books.html";
+        }
+    }
+
+    @RequestMapping("/book_admin_lend_do.html")
+    public String adminBookLd(HttpServletRequest request,RedirectAttributes redirectAttributes) {
+        String bookIdStr = request.getParameter("bookId");
+        long bookId = Long.parseLong(bookIdStr);
+        Book bk = bookService.getBook(bookId);
+        if(bk.getNumber() < 1){
+            redirectAttributes.addFlashAttribute("succ", "没有库存了，借阅失败");
+            return "redirect:/admin_books.html";
+        }else {
+            long readerId = Long.parseLong(request.getParameter("readerId"));
+            if (lendService.lendBook(bookId, readerId)) {
+                redirectAttributes.addFlashAttribute("succ", "借阅成功");
+            }
+        }
+        return "redirect:/admin_books.html";
+    }
 
     @RequestMapping("/book_add_do.html")
     public String addBookDo(@RequestParam(value = "pubstr") String pubstr, Book book, RedirectAttributes redirectAttributes) {
