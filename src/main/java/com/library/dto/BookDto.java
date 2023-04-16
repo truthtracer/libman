@@ -10,6 +10,15 @@ public class BookDto extends Book {
     private Integer pageSize;
     private Integer pageNum;
     private Integer offset;
+    private Integer status;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public Integer getOffset() {
         return offset;

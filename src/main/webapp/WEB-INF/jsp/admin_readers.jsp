@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt"%>
+
 <html>
 <head>
     <title>全部读者</title>
@@ -65,19 +67,26 @@ background-attachment: fixed;">
             <tbody>
             <c:forEach items="${readers}" var="reader">
                 <tr>
-                    <td><c:out value="${reader.readerId}"></c:out></td>
+                    <td><c:out value="${reader.readerNo}"></c:out></td>
                     <td><c:out value="${reader.name}"></c:out></td>
                     <td><c:out value="${reader.sex}"></c:out></td>
-                    <td><c:out value="${reader.birth}"></c:out></td>
+                    <td><fmt:formatDate pattern="yyyy-MM-dd" value="${reader.birth}"/></td>
                     <td><c:out value="${reader.address}"></c:out></td>
                     <td><c:out value="${reader.phone}"></c:out></td>
                     <td><a href="reader_edit.html?readerId=<c:out value="${reader.readerId}"></c:out>"><button type="button" class="btn btn-info btn-xs">编辑</button></a></td>
-                    <td><a href="reader_delete.html?readerId=<c:out value="${reader.readerId}"></c:out>"><button type="button" class="btn btn-danger btn-xs">删除</button></a></td>
+                    <td><a href='javascript:void(0)' onclick='del(<c:out value="${reader.readerId}"></c:out>)'><button type="button" class="btn btn-danger btn-xs">删除</button></a></td>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
     </div>
 </div>
+<script>
+    function del(rdId){
+        if(window.confirm("确认删除吗？将删除所有该读者的借阅记录,请谨慎操作")) {
+            location.href = "reader_delete.html?readerId=" + rdId;
+        }
+    }
+</script>
 </body>
 </html>

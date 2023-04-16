@@ -18,9 +18,9 @@ background-attachment: fixed;">
 
 <div id="header"></div>
 
-<div style="padding: 70px 550px 10px">
+<div style="padding: 70px 400px 10px">
     <form   method="post" action="querybook.html" class="form-inline"  id="searchform">
-        <div class="input-group" style="width:500px">
+        <div class="input-group" style="width:800px">
             <select name="choice" class="form-control" style="border-radius:4px;width:150px;margin-right:30px">
                 <option value="1"
                         <c:if test="${(!empty choice) && choice==1}">
@@ -32,6 +32,14 @@ background-attachment: fixed;">
                     selected="selected"
                     </c:if>>按其他关键词查
                 </option>
+            </select>
+            <select name="status" class="form-control" style="border-radius:4px;width:150px;margin-right:30px">
+                <option value="" <c:if test="${(empty status)}">
+                    selected="selected"
+                </c:if>>全部状态</option>
+                <option value="2"  <c:if test="${(!empty status) && status==2}">
+                    selected="selected"
+                </c:if>>有借出未还</option>
             </select>
            <input type="text" placeholder="输入关键词" class="form-control" style="width:190px; border-radius:4px;margin-right:30px" id="search" name="searchWord" class="form-control">
             <input type="hidden" id="hdnPage" name="pageNum"/>

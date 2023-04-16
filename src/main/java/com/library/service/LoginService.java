@@ -14,8 +14,8 @@ public class LoginService {
     @Autowired
     private AdminDao adminDao;
 
-    public boolean hasMatchReader(long readerId,String password){
-        return  readerCardDao.getIdMatchCount(readerId, password)>0;
+    public boolean hasMatchReader(long readerNo,String password){
+        return  readerCardDao.getIdMatchCount(readerNo, password)>0;
     }
 
     public String getAdminUsername(long adminId) {

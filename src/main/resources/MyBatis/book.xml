@@ -35,6 +35,17 @@
             and (isbn like #{isbn})
         </if>
     </select>
+
+    <select id="countNotBackBook" resultType="int" parameterType="com.library.dto.BookDto">
+        select  count(a.book_id) from book_info a
+        inner join (select distinct book_id from lend_list where back_date is null ) as b on a.book_id = b.book_id  where 1=1
+        <if test="name != null">
+            and (name like #{name} or author like #{name} or introduction like #{name})
+        </if>
+        <if test="isbn != null">
+            and (isbn like #{isbn})
+        </if>
+    </select>
     <select id="queryBook" resultType="com.library.bean.Book" parameterType="com.library.dto.BookDto">
         select * from book_info where 1=1
         <if test="name != null">
@@ -47,6 +58,21 @@
             order by book_id asc limit ${offset},${pageSize}
         </if>
     </select>
+    <select id="queryNotBackBook" resultType="com.library.bean.Book" parameterType="com.library.dto.BookDto">
+        select  a.*  from book_info a
+        inner join (select distinct book_id from lend_list where back_date is null ) as b on a.book_id   = b.book_id
+        where 1=1
+        <if test="name != null">
+            and (name like #{name} or author like #{name} or introduction like #{name})
+        </if>
+        <if test="isbn != null">
+            and (isbn like #{isbn})
+        </if>
+        <if test="offset != null">
+            order by book_id asc limit ${offset},${pageSize}
+        </if>
+    </select>
+
     <select id="matchBook" resultType="int" parameterType="com.library.bean.Book">
         select count(*) from book_info where 1=1
         <if test="name != null">

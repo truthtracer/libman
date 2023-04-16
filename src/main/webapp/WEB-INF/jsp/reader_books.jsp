@@ -19,7 +19,7 @@ background-attachment: fixed;">
 
 <div id="header"></div>
 
-<div style="padding: 20px 550px 10px">
+<div style="padding: 20px 450px 10px">
     <form method="post" action="reader_querybook_do.html" class="form-inline" id="searchform">
         <div class="input-group" style="width:500px">
             <select name="choice" class="form-control" style="border-radius:4px;width:150px;margin-right:30px">

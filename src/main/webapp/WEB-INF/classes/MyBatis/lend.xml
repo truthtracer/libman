@@ -30,4 +30,12 @@
     <select id="lendListOfBook" parameterType="long" resultType="com.library.bean.Lend">
         select * from lend_list where book_id = #{bookId} and back_date is null
     </select>
+    <delete id="deleteByReaderId" parameterType="long">
+        delete from lend_list where reader_id = #{readerId}
+    </delete>
+    <update id="changeStruc">
+        alter table lend_list
+            modify `lend_date` datetime,
+            modify back_date datetime;
+    </update>
 </mapper>

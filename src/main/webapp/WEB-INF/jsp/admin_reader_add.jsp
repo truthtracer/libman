@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix ="fmt" uri ="http://java.sun.com/jsp/jstl/fmt"%>
+
 <html>
 <head>
     <title>添加读者</title>
@@ -25,7 +27,8 @@ background-attachment: fixed;">
             <form action="reader_add_do.html" method="post" id="readeredit" >
                 <div class="input-group" style="padding-top: 20px;">
                     <span  class="input-group-addon">密码</span>
-                    <input  type="password" class="form-control" name="password" id="password" ">
+                    <input  type="password" class="form-control" name="password" id="password"
+                    readonly="readonly" value="12345">
                 </div>
                 <div class="input-group" style="padding-top: 20px;">
                     <span class="input-group-addon">姓名</span>
@@ -34,6 +37,11 @@ background-attachment: fixed;">
                 <div class="input-group" style="padding-top: 20px;">
                     <span  class="input-group-addon">性别</span>
                     <input type="text" class="form-control" name="sex" id="sex" >
+                </div>
+                <div class="input-group" style="padding-top: 20px;">
+                    <span  class="input-group-addon">读者号</span>
+                    <input type="text" class="form-control" name="readerNo" id="readerNo" >
+                    <label>当前最大读者号：${lastReaderNo}</label>
                 </div>
                 <div class="input-group" style="padding-top: 20px;">
                     <span class="input-group-addon">生日</span>
@@ -54,7 +62,7 @@ background-attachment: fixed;">
                         return flag;
                     }
                     $("#readeredit").submit(function () {
-                        if($("#password").val()==''||$("#name").val()==''||$("#sex").val()==''||$("#birth").val()==''||$("#address").val()==''||$("#phone").val()==''){
+                        if($("#password").val()==''||$("#name").val()==''||$("#readerNo").val()==''){
                             alert("请填入完整读者信息！");
                             return mySubmit(false);
                         }

@@ -51,7 +51,7 @@ public class BookService {
         return arr;
     }
 
-    public ArrayList<Book> queryBook(String searchWord,Integer choice,int pageSize,int pageNum) {
+    public ArrayList<Book> queryBook(String searchWord,Integer choice,Integer status,int pageSize,int pageNum) {
         String search = null;
         if(searchWord != null){
             searchWord = searchWord.trim();
@@ -78,12 +78,13 @@ public class BookService {
         bookDto.setIsbn(book.getIsbn());
         bookDto.setPageNum(pageNum);
         bookDto.setPageSize(pageSize);
+        bookDto.setStatus(status);
         ArrayList<Book> arr = bookDao.queryBook(bookDto);
         log.info("arr: "+ arr.size());
         System.out.println("arr: "+ arr.size());
         return arr;
     }
-    public int queryBookCount(String searchWord,Integer choice) {
+    public int queryBookCount(String searchWord,Integer choice,Integer status) {
         String search =null;
         if(null != searchWord){
             searchWord = searchWord.trim();
@@ -102,7 +103,11 @@ public class BookService {
         BookDto bookDto=new BookDto();
         bookDto.setName(book.getName());
         bookDto.setIsbn(book.getIsbn());
-        return bookDao.countBook(bookDto);
+        bookDto.setStatus(status);
+        if(status == null)
+            return bookDao.countBook(bookDto);
+        else
+            return bookDao.countNotBackBook(bookDto);
     }
 
 
