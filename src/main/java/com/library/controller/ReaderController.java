@@ -93,7 +93,7 @@ private LendService lendService;
         long readerId = Long.parseLong(request.getParameter("readerId"));
         ReaderInfo readerInfo = getReaderInfo(readerId, name, sex, birth, address, phone,readerNo);
         ReaderInfo dbReaderInfo = readerInfoService.getRed(readerNo);
-        if(dbReaderInfo != null && !dbReaderInfo.getReaderNo().equals(readerNo)){
+        if(dbReaderInfo != null && dbReaderInfo.getReaderId()!=(readerId)){
             redirectAttributes.addFlashAttribute("error", "读者信息修改失败(读者号重复)！");
         }else {
             if (readerInfoService.editReaderInfo(readerInfo) && readerInfoService.editReaderCard(readerInfo)) {
@@ -118,9 +118,7 @@ private LendService lendService;
         ReaderInfo dbReaderInfo = readerInfoService.getRed(readerNo);
         if (dbReaderInfo != null) {
             redirectAttributes.addFlashAttribute("succ", "添加读者信息失败(读者号重复)！");
-
         } else {
-
             ReaderInfo readerInfo = getReaderInfo(0, name, sex, birth, address, phone, readerNo);
             long readerId = readerInfoService.addReaderInfo(readerInfo);
             readerInfo.setReaderId(readerId);
